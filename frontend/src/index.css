@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@import "daisyui/daisyui.css";
+
+@theme {
+    --color-primary-pink: #ffb6c1;
+    --color-primary-pink-hover: #ff99a8;
+    --color-bg-dark: #121212;
+    --color-bg-darker: #0a0a0a;
+    --color-surface: #1e1e1e;
+    --color-surface-light: #2c2c2c;
+    --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+    body {
+        @apply bg-bg-darker text-white;
+        font-family: var(--font-sans);
+    }
+}
+
+@layer utilities {
+    .glass-panel {
+        background: rgba(30, 30, 30, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-bubble {
+        background: rgba(255, 182, 193, 0.15);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 182, 193, 0.3);
+    }
+
+    .text-glow {
+        text-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
+    }
+}
+
+@keyframes flyUp {
+    0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-20vh) scale(1.5) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+.animate-fly-up {
+    animation: flyUp 15s linear infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-surface-light);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3f3f4a;
+}
