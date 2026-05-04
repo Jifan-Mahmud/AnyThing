@@ -2,6 +2,10 @@ import React from 'react';
 import StoriesBar from '../components/feed/StoriesBar';
 import PostCard from '../components/feed/PostCard';
 
+// Import local assets
+import reel1 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM.mp4';
+import reel2 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM (1).mp4';
+
 const MOCK_STORIES = [
   { id: 1, username: 'alex_dev', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix', viewed: false },
   { id: 2, username: 'mira_art', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka', viewed: false },
@@ -70,7 +74,45 @@ const Feed = () => {
         <StoriesBar stories={MOCK_STORIES} />
         
         <div className="mt-8">
-          {MOCK_POSTS.map((post) => (
+          {/* Post 1 */}
+          <PostCard post={MOCK_POSTS[0]} />
+
+          {/* Reels Section (Instagram injects these into the feed) */}
+          <div className="my-8 py-4 bg-surface rounded-2xl border border-white/5 overflow-hidden">
+            <div className="px-4 flex items-center justify-between mb-4">
+              <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                <span className="text-2xl">🎬</span> Reels
+              </h3>
+            </div>
+            
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar px-4 pb-2 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {[
+                { id: 1, video: reel1, views: '1.2M', user: 'jason_creativ' },
+                { id: 2, video: reel2, views: '840K', user: 'sarah_codes' },
+                { id: 3, video: reel1, views: '200K', user: 'alex_dev' }, // Reusing videos for demo
+                { id: 4, video: reel2, views: '50K', user: 'mira_art' },
+              ].map(reel => (
+                <div key={reel.id} className="relative w-40 h-72 flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group">
+                  <video 
+                    src={reel.video} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    muted 
+                    loop 
+                    onMouseOver={(e) => e.target.play()} 
+                    onMouseOut={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-3 left-3 text-white">
+                    <p className="text-xs font-bold shadow-sm flex items-center gap-1">▷ {reel.views}</p>
+                    <p className="text-xs text-gray-300 shadow-sm">@{reel.user}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Remaining Posts */}
+          {MOCK_POSTS.slice(1).map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

@@ -4,11 +4,11 @@ import { Home, Compass, MessageSquare, User, PlusSquare, Clapperboard } from 'lu
 
 const MobileNav = ({ onOpenCreatePost }) => {
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Reels', path: '/reels', icon: Clapperboard },
-    { name: 'Explore', path: '/explore', icon: Compass },
-    { name: 'Messages', path: '/messages', icon: MessageSquare },
-    { name: 'Profile', path: '/profile', icon: User },
+    { name: 'Home', path: '/app', icon: Home },
+    { name: 'Reels', path: '/app/reels', icon: Clapperboard },
+    { name: 'Explore', path: '/app/explore', icon: Compass },
+    { name: 'Messages', path: '/app/messages', icon: MessageSquare },
+    { name: 'Profile', path: '/app/profile', icon: User },
   ];
 
   return (
@@ -17,6 +17,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
         <NavLink
           key={item.name}
           to={item.path}
+          end={item.path === '/app'}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
               isActive
@@ -41,6 +42,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
         <NavLink
           key={item.name}
           to={item.path}
+          end={item.path === '/app'}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
               isActive

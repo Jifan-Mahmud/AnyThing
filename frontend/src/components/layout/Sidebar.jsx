@@ -9,19 +9,21 @@ import LogoImage from '../../assets/Logo.png';
 
 const Sidebar = ({ onOpenCreatePost }) => {
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Reels', path: '/reels', icon: Clapperboard },
-    { name: 'Explore', path: '/explore', icon: Compass },
-    { name: 'Messages', path: '/messages', icon: MessageSquare },
-    { name: 'Notifications', path: '/notifications', icon: Bell },
-    { name: 'Profile', path: '/profile', icon: User },
+    { name: 'Home', path: '/app', icon: Home },
+    { name: 'Reels', path: '/app/reels', icon: Clapperboard },
+    { name: 'Explore', path: '/app/explore', icon: Compass },
+    { name: 'Messages', path: '/app/messages', icon: MessageSquare },
+    { name: 'Notifications', path: '/app/notifications', icon: Bell },
+    { name: 'Profile', path: '/app/profile', icon: User },
   ];
 
   return (
     <div className="flex flex-col h-full py-8 px-6">
       {/* Logo */}
-      <div className="mb-12 px-2">
-        <img src={LogoImage} alt="AnyThing Logo" className="h-8 object-contain filter invert" />
+      <div className="mb-12 px-4">
+        <div className="text-3xl font-black tracking-tighter italic text-white">
+          Any<span className="text-primary-pink drop-shadow-[0_0_10px_rgba(255,105,180,0.3)]">Thing</span>
+        </div>
       </div>
 
       {/* Navigation Links */}
@@ -30,6 +32,7 @@ const Sidebar = ({ onOpenCreatePost }) => {
           <NavLink
             key={item.name}
             to={item.path}
+            end={item.path === '/app'}
             className={({ isActive }) =>
               `flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 ${
                 isActive

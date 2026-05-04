@@ -3,8 +3,8 @@
 @import "daisyui/daisyui.css";
 
 @theme {
-    --color-primary-pink: #ffb6c1;
-    --color-primary-pink-hover: #ff99a8;
+    --color-primary-pink: #ff69b4;
+    --color-primary-pink-hover: #ff1493;
     --color-bg-dark: #121212;
     --color-bg-darker: #0a0a0a;
     --color-surface: #1e1e1e;
@@ -28,14 +28,14 @@
     }
 
     .glass-bubble {
-        background: rgba(255, 182, 193, 0.15);
+        background: rgba(255, 105, 180, 0.15);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 182, 193, 0.3);
+        border: 1px solid rgba(255, 105, 180, 0.3);
     }
 
     .text-glow {
-        text-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
+        text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
     }
 }
 
