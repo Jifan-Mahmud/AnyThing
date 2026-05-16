@@ -77,6 +77,23 @@ const StoryViewerModal = ({ isOpen, onClose, storyUser }) => {
         <div className="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer" onClick={handlePrev} />
         <div className="absolute inset-y-0 right-0 w-2/3 z-10 cursor-pointer" onClick={handleNext} />
         
+        {/* Reply Box */}
+        <div className="absolute bottom-0 left-0 right-0 z-30 p-4 md:p-6 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="flex items-center gap-3 bg-black/40 backdrop-blur-md border border-white/20 rounded-full px-4 py-3 shadow-lg">
+            <input 
+              type="text" 
+              placeholder={`Reply to ${storyUser.username}...`} 
+              className="flex-1 bg-transparent text-white placeholder-white/80 focus:outline-none text-sm z-40 relative"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="flex items-center gap-2 z-40 relative">
+              <button onClick={(e) => e.stopPropagation()} className="text-xl hover:scale-125 transition-transform">❤️</button>
+              <button onClick={(e) => e.stopPropagation()} className="text-xl hover:scale-125 transition-transform">🔥</button>
+              <button onClick={(e) => e.stopPropagation()} className="text-xl hover:scale-125 transition-transform">😂</button>
+            </div>
+          </div>
+        </div>
+        
         {/* Navigation Arrows (Desktop) */}
         <button 
           onClick={handlePrev} 

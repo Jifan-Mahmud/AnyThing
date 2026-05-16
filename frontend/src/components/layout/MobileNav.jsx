@@ -1,15 +1,24 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Compass, MessageSquare, User, PlusSquare, Clapperboard } from 'lucide-react';
 
 const MobileNav = ({ onOpenCreatePost }) => {
+  const location = useLocation();
   const navItems = [
     { name: 'Home', path: '/app', icon: Home },
     { name: 'Reels', path: '/app/reels', icon: Clapperboard },
     { name: 'Explore', path: '/app/explore', icon: Compass },
-    { name: 'Messages', path: '/app/messages', icon: MessageSquare },
     { name: 'Profile', path: '/app/profile', icon: User },
   ];
+
+  const checkIsActive = (itemPath, isActive) => {
+    if (!isActive) return false;
+    // If it's the profile path, only highlight if we're not viewing someone else's profile
+    if (itemPath === '/app/profile') {
+      return !location.state?.user;
+    }
+    return true;
+  };
 
   return (
     <nav className="flex items-center justify-around h-full px-2 relative">
@@ -20,7 +29,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
           end={item.path === '/app'}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
-              isActive
+              checkIsActive(item.path, isActive)
                 ? 'text-primary-pink'
                 : 'text-gray-400 hover:text-white'
             }`
@@ -45,7 +54,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
           end={item.path === '/app'}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
-              isActive
+              checkIsActive(item.path, isActive)
                 ? 'text-primary-pink'
                 : 'text-gray-400 hover:text-white'
             }`

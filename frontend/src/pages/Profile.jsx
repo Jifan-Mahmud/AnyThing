@@ -1,5 +1,6 @@
-import React from 'react';
-import { Settings, Grid, Bookmark, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings, Grid, Bookmark, UserPlus, ArrowLeft } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '../components/ui/Avatar';
 
 const MOCK_PROFILE = {
@@ -22,60 +23,134 @@ const MOCK_USER_POSTS = [
 ];
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const passedUser = location.state?.user;
+  const isCurrentUser = !passedUser || passedUser.username === MOCK_PROFILE.username;
+  
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const handleBack = () => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const displayUser = isCurrentUser ? MOCK_PROFILE : {
+    ...MOCK_PROFILE,
+    username: passedUser.username,
+    avatar: passedUser.avatar,
+    name: passedUser.username.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+    bio: `Hey there! I am ${passedUser.username}. Welcome to my profile! ✨`
+  };
+
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 py-8 md:px-8">
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 py-6 md:py-8 md:px-8">
+      {!isCurrentUser && (
+        <button 
+          onClick={handleBack}
+          className="flex items-center gap-2 text-white mb-6 hover:text-primary-pink transition-colors w-max"
+        >
+          <ArrowLeft size={20} />
+          <span className="font-semibold">Back</span>
+        </button>
+      )}
       {/* Profile Header */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
-        <div className="flex-shrink-0">
-          <Avatar src={MOCK_PROFILE.avatar} size="xl" className="border-4 border-surface" />
+      <div className="flex flex-col md:flex-row md:gap-8 mb-8 md:mb-12">
+        {/* Mobile: Avatar and Stats side by side. Desktop: Avatar left, rest right */}
+        <div className="flex items-center gap-6 md:gap-8 mb-4 md:mb-0">
+          <div className="flex-shrink-0">
+            <Avatar src={displayUser.avatar} size="xl" className="border-4 border-surface w-20 h-20 md:w-32 md:h-32" />
+          </div>
+
+          {/* Stats (Mobile only view, hidden on md) */}
+          <div className="flex flex-1 justify-around text-center md:hidden">
+            <div className="flex flex-col">
+              <span className="font-bold text-lg">{displayUser.posts}</span>
+              <span className="text-gray-400 text-xs">posts</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg">{displayUser.followers}k</span>
+              <span className="text-gray-400 text-xs">followers</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg">{displayUser.following}</span>
+              <span className="text-gray-400 text-xs">following</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left w-full">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4 w-full justify-center md:justify-start">
-            <h1 className="text-2xl font-bold">{MOCK_PROFILE.username}</h1>
-            <div className="flex gap-2 justify-center">
-              <button className="px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
-                Edit Profile
-              </button>
+        <div className="flex-1 flex flex-col w-full">
+          {/* Header Actions */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
+            <h1 className="text-xl md:text-2xl font-bold">{displayUser.username}</h1>
+            <div className="flex gap-2">
+              {isCurrentUser ? (
+                <>
+                  <button className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
+                    Edit Profile
+                  </button>
+                  <button className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
+                    Share Profile
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => setIsFollowing(!isFollowing)}
+                    className={`flex-1 md:flex-none px-6 py-1.5 rounded-lg font-bold text-sm transition-all ${
+                      isFollowing 
+                        ? 'bg-surface-light text-white hover:bg-surface' 
+                        : 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-lg shadow-primary-pink/20'
+                    }`}
+                  >
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                  <button className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
+                    Message
+                  </button>
+                </>
+              )}
               <button className="p-1.5 bg-surface-light text-white rounded-lg hover:bg-surface transition-colors">
                 <Settings size={20} />
               </button>
             </div>
           </div>
 
-          <div className="flex gap-6 mb-4 text-sm">
-            <div className="flex flex-col md:flex-row md:gap-1 items-center">
-              <span className="font-bold text-lg md:text-base">{MOCK_PROFILE.posts}</span>
-              <span className="text-gray-400">posts</span>
+          {/* Stats (Desktop only view) */}
+          <div className="hidden md:flex gap-10 mb-6 text-sm md:text-base">
+            <div>
+              <span className="font-bold">{displayUser.posts}</span> <span className="text-gray-400">posts</span>
             </div>
-            <div className="flex flex-col md:flex-row md:gap-1 items-center cursor-pointer">
-              <span className="font-bold text-lg md:text-base">{MOCK_PROFILE.followers}k</span>
-              <span className="text-gray-400">followers</span>
+            <div className="cursor-pointer">
+              <span className="font-bold">{displayUser.followers}k</span> <span className="text-gray-400">followers</span>
             </div>
-            <div className="flex flex-col md:flex-row md:gap-1 items-center cursor-pointer">
-              <span className="font-bold text-lg md:text-base">{MOCK_PROFILE.following}</span>
-              <span className="text-gray-400">following</span>
+            <div className="cursor-pointer">
+              <span className="font-bold">{displayUser.following}</span> <span className="text-gray-400">following</span>
             </div>
           </div>
 
-          <div className="text-sm">
-            <h2 className="font-bold">{MOCK_PROFILE.name}</h2>
-            <p className="whitespace-pre-line text-gray-300 mt-1">{MOCK_PROFILE.bio}</p>
+          {/* Bio */}
+          <div className="text-sm md:text-base">
+            <h2 className="font-bold">{displayUser.name}</h2>
+            <p className="whitespace-pre-line text-gray-300 mt-1">{displayUser.bio}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-center border-t border-white/10 mb-6">
-        <div className="flex gap-12">
-          <button className="flex items-center gap-2 py-4 border-t-2 border-primary-pink text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <Grid size={16} /> Posts
+      <div className="flex justify-around md:justify-center border-t border-white/10 mb-1 md:mb-6">
+        <div className="flex w-full md:w-auto md:gap-12 justify-around">
+          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-primary-pink text-white font-semibold text-xs tracking-widest uppercase transition-colors">
+            <Grid size={24} className="md:w-4 md:h-4" /> <span className="hidden md:inline">Posts</span>
           </button>
-          <button className="flex items-center gap-2 py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <Bookmark size={16} /> Saved
+          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
+            <Bookmark size={24} className="md:w-4 md:h-4" /> <span className="hidden md:inline">Saved</span>
           </button>
-          <button className="flex items-center gap-2 py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <UserPlus size={16} /> Tagged
+          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
+            <UserPlus size={24} className="md:w-4 md:h-4" /> <span className="hidden md:inline">Tagged</span>
           </button>
         </div>
       </div>

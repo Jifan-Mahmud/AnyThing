@@ -1,13 +1,10 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import Avatar from '../ui/Avatar';
-
-// Note: Ensure lucide-react is installed or use the provided assets.
 import { Home, Compass, MessageSquare, Bell, User, PlusSquare, Clapperboard } from 'lucide-react';
 
-import LogoImage from '../../assets/Logo.png';
-
 const Sidebar = ({ onOpenCreatePost }) => {
+  const location = useLocation();
   const navItems = [
     { name: 'Home', path: '/app', icon: Home },
     { name: 'Reels', path: '/app/reels', icon: Clapperboard },
@@ -16,6 +13,14 @@ const Sidebar = ({ onOpenCreatePost }) => {
     { name: 'Notifications', path: '/app/notifications', icon: Bell },
     { name: 'Profile', path: '/app/profile', icon: User },
   ];
+
+  const checkIsActive = (itemPath, isActive) => {
+    if (!isActive) return false;
+    if (itemPath === '/app/profile') {
+      return !location.state?.user;
+    }
+    return true;
+  };
 
   return (
     <div className="flex flex-col h-full py-8 px-6">
@@ -35,7 +40,7 @@ const Sidebar = ({ onOpenCreatePost }) => {
             end={item.path === '/app'}
             className={({ isActive }) =>
               `flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 ${
-                isActive
+                checkIsActive(item.path, isActive)
                   ? 'bg-surface-light text-primary-pink font-semibold'
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`

@@ -70,15 +70,17 @@ const Feed = () => {
   return (
     <div className="flex h-full w-full justify-center">
       {/* Main Feed Column */}
-      <div className="w-full max-w-2xl px-4 py-6 md:px-8">
-        <StoriesBar stories={MOCK_STORIES} />
+      <div className="w-full max-w-2xl px-0 md:px-8 py-2 md:py-6 overflow-x-hidden">
+        <div className="px-4 md:px-0">
+          <StoriesBar stories={MOCK_STORIES} />
+        </div>
         
-        <div className="mt-8">
+        <div className="mt-4 md:mt-8">
           {/* Post 1 */}
           <PostCard post={MOCK_POSTS[0]} />
 
           {/* Reels Section (Instagram injects these into the feed) */}
-          <div className="my-8 py-4 bg-surface rounded-2xl border border-white/5 overflow-hidden">
+          <div className="my-4 md:my-8 py-4 bg-surface md:rounded-2xl border-y md:border border-white/5 overflow-hidden">
             <div className="px-4 flex items-center justify-between mb-4">
               <h3 className="text-white font-bold text-lg flex items-center gap-2">
                 <span className="text-2xl">🎬</span> Reels
@@ -92,7 +94,7 @@ const Feed = () => {
                 { id: 3, video: reel1, views: '200K', user: 'alex_dev' }, // Reusing videos for demo
                 { id: 4, video: reel2, views: '50K', user: 'mira_art' },
               ].map(reel => (
-                <div key={reel.id} className="relative w-40 h-72 flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group">
+                <div key={reel.id} className="relative w-36 h-64 md:w-40 md:h-72 flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group">
                   <video 
                     src={reel.video} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
