@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Compass, MessageSquare, User, PlusSquare, Clapperboard } from 'lucide-react';
 
 const MobileNav = ({ onOpenCreatePost }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const navItems = [
     { name: 'Home', path: '/app', icon: Home },
     { name: 'Reels', path: '/app/reels', icon: Clapperboard },
@@ -27,6 +28,12 @@ const MobileNav = ({ onOpenCreatePost }) => {
           key={item.name}
           to={item.path}
           end={item.path === '/app'}
+          onClick={(e) => {
+            if (item.path === '/app/profile') {
+              e.preventDefault();
+              navigate('/app/profile', { state: { user: null } });
+            }
+          }}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
               checkIsActive(item.path, isActive)
@@ -52,6 +59,12 @@ const MobileNav = ({ onOpenCreatePost }) => {
           key={item.name}
           to={item.path}
           end={item.path === '/app'}
+          onClick={(e) => {
+            if (item.path === '/app/profile') {
+              e.preventDefault();
+              navigate('/app/profile', { state: { user: null } });
+            }
+          }}
           className={({ isActive }) =>
             `p-3 rounded-xl transition-all duration-300 ${
               checkIsActive(item.path, isActive)

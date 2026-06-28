@@ -44,16 +44,18 @@ const PostCard = ({ post }) => {
             <p className="text-xs text-gray-400">{post.location || post.timeAgo}</p>
           </div>
         </div>
-        <button 
-          onClick={() => setIsFollowing(!isFollowing)}
-          className={`text-sm font-bold transition-colors ${
-            isFollowing 
-              ? 'text-gray-400 hover:text-white' 
-              : 'text-primary-pink hover:text-primary-pink-hover'
-          }`}
-        >
-          {isFollowing ? 'Following' : 'Follow'}
-        </button>
+        {post.user.username !== 'jason_creativ' && (
+          <button 
+            onClick={() => setIsFollowing(!isFollowing)}
+            className={`text-sm font-bold transition-colors ${
+              isFollowing 
+                ? 'text-gray-400 hover:text-white' 
+                : 'text-primary-pink hover:text-primary-pink-hover'
+            }`}
+          >
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
+        )}
       </div>
 
       {/* Post Image */}

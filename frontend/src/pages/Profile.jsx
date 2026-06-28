@@ -1,34 +1,71 @@
-import React, { useState } from 'react';
-import { Settings, Grid, Bookmark, UserPlus, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Grid, Bookmark, UserPlus, ArrowLeft, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '../components/ui/Avatar';
-
-const MOCK_PROFILE = {
-  username: 'jason_creativ',
-  name: 'Jason Creativ',
-  bio: 'Digital artist & UI/UX designer. Exploring the intersection of neon and brutalism. 🎨✨\nBased in New York.',
-  followers: 12.4,
-  following: 842,
-  posts: 42,
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jason'
-};
-
-const MOCK_USER_POSTS = [
-  { id: 1, image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop', likes: 2481, comments: 84 },
-  { id: 2, image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop', likes: 1102, comments: 12 },
-  { id: 3, image: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=800&auto=format&fit=crop', likes: 856, comments: 24 },
-  { id: 4, image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop', likes: 3402, comments: 142 },
-  { id: 5, image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=800&auto=format&fit=crop', likes: 210, comments: 5 },
-  { id: 6, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop', likes: 5892, comments: 402 },
-];
+import { useAuth } from '../context/AuthContext';
+import EditProfileModal from '../components/profile/EditProfileModal';
 
 const Profile = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const passedUser = location.state?.user;
-  const isCurrentUser = !passedUser || passedUser.username === MOCK_PROFILE.username;
+  const { user } = useAuth();
   
+  const passedUser = location.state?.user;
+  const isCurrentUser = !passedUser || passedUser.username === user?.username;
+
+  const [profileData, setProfileData] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const fetchProfileAndPosts = async () => {
+    setLoading(true);
+    try {
+      let targetUser = null;
+      let isSelf = !passedUser || passedUser.username === user?.username;
+
+      if (isSelf) {
+        // Fetch current user details (to get latest stats)
+        const res = await fetch(`http://localhost:5000/api/me`, { credentials: "include" });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          targetUser = data.data;
+        } else {
+          targetUser = user;
+        }
+      } else {
+        // Fetch public profile by username
+        const res = await fetch(`http://localhost:5000/api/users/${passedUser.username}`, { credentials: "include" });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          targetUser = data.data;
+          setIsFollowing(data.data.isFollowing || false);
+        }
+      }
+
+      setProfileData(targetUser);
+
+      // Fetch posts for this user
+      if (targetUser?._id) {
+        const res = await fetch(`http://localhost:5000/api/users/${targetUser._id}/posts`, { credentials: "include" });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setPosts(data.data.posts || []);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching profile details:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchProfileAndPosts();
+    }
+  }, [passedUser, user]);
 
   const handleBack = () => {
     if (location.state?.from) {
@@ -38,12 +75,40 @@ const Profile = () => {
     }
   };
 
-  const displayUser = isCurrentUser ? MOCK_PROFILE : {
-    ...MOCK_PROFILE,
-    username: passedUser.username,
-    avatar: passedUser.avatar,
-    name: passedUser.username.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-    bio: `Hey there! I am ${passedUser.username}. Welcome to my profile! ✨`
+  const handleFollowToggle = async () => {
+    if (!profileData) return;
+    try {
+      const method = isFollowing ? "DELETE" : "POST";
+      const res = await fetch(`http://localhost:5000/api/follow/${profileData._id}`, {
+        method,
+        credentials: "include"
+      });
+      if (res.ok) {
+        setIsFollowing(!isFollowing);
+        // Refresh counts
+        fetchProfileAndPosts();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading && !profileData) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader2 className="animate-spin text-primary-pink" size={40} />
+      </div>
+    );
+  }
+
+  const displayUser = profileData || {
+    username: passedUser?.username || "loading",
+    name: passedUser?.username || "Loading Profile",
+    bio: "",
+    avatarUrl: passedUser?.avatar || "",
+    posts: 0,
+    followers: 0,
+    following: 0
   };
 
   return (
@@ -59,24 +124,28 @@ const Profile = () => {
       )}
       {/* Profile Header */}
       <div className="flex flex-col md:flex-row md:gap-8 mb-8 md:mb-12">
-        {/* Mobile: Avatar and Stats side by side. Desktop: Avatar left, rest right */}
+        {/* Mobile: Avatar and Stats side by side */}
         <div className="flex items-center gap-6 md:gap-8 mb-4 md:mb-0">
           <div className="flex-shrink-0">
-            <Avatar src={displayUser.avatar} size="xl" className="border-4 border-surface w-20 h-20 md:w-32 md:h-32" />
+            <Avatar 
+              src={displayUser.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder"} 
+              size="xl" 
+              className="border-4 border-surface w-20 h-20 md:w-32 md:h-32" 
+            />
           </div>
 
-          {/* Stats (Mobile only view, hidden on md) */}
+          {/* Stats (Mobile only view) */}
           <div className="flex flex-1 justify-around text-center md:hidden">
             <div className="flex flex-col">
-              <span className="font-bold text-lg">{displayUser.posts}</span>
+              <span className="font-bold text-lg">{posts.length}</span>
               <span className="text-gray-400 text-xs">posts</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg">{displayUser.followers}k</span>
+              <span className="font-bold text-lg">{displayUser.followerCount || 0}</span>
               <span className="text-gray-400 text-xs">followers</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg">{displayUser.following}</span>
+              <span className="font-bold text-lg">{displayUser.followingCount || 0}</span>
               <span className="text-gray-400 text-xs">following</span>
             </div>
           </div>
@@ -85,11 +154,14 @@ const Profile = () => {
         <div className="flex-1 flex flex-col w-full">
           {/* Header Actions */}
           <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
-            <h1 className="text-xl md:text-2xl font-bold">{displayUser.username}</h1>
+            <h1 className="text-xl md:text-2xl font-bold">@{displayUser.username}</h1>
             <div className="flex gap-2">
               {isCurrentUser ? (
                 <>
-                  <button className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
+                  <button 
+                    onClick={() => setIsEditOpen(true)}
+                    className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors"
+                  >
                     Edit Profile
                   </button>
                   <button className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-lg font-semibold text-sm hover:bg-surface transition-colors">
@@ -99,7 +171,7 @@ const Profile = () => {
               ) : (
                 <>
                   <button 
-                    onClick={() => setIsFollowing(!isFollowing)}
+                    onClick={handleFollowToggle}
                     className={`flex-1 md:flex-none px-6 py-1.5 rounded-lg font-bold text-sm transition-all ${
                       isFollowing 
                         ? 'bg-surface-light text-white hover:bg-surface' 
@@ -122,20 +194,20 @@ const Profile = () => {
           {/* Stats (Desktop only view) */}
           <div className="hidden md:flex gap-10 mb-6 text-sm md:text-base">
             <div>
-              <span className="font-bold">{displayUser.posts}</span> <span className="text-gray-400">posts</span>
+              <span className="font-bold">{posts.length}</span> <span className="text-gray-400">posts</span>
             </div>
             <div className="cursor-pointer">
-              <span className="font-bold">{displayUser.followers}k</span> <span className="text-gray-400">followers</span>
+              <span className="font-bold">{displayUser.followerCount || 0}</span> <span className="text-gray-400">followers</span>
             </div>
             <div className="cursor-pointer">
-              <span className="font-bold">{displayUser.following}</span> <span className="text-gray-400">following</span>
+              <span className="font-bold">{displayUser.followingCount || 0}</span> <span className="text-gray-400">following</span>
             </div>
           </div>
 
           {/* Bio */}
           <div className="text-sm md:text-base">
-            <h2 className="font-bold">{displayUser.name}</h2>
-            <p className="whitespace-pre-line text-gray-300 mt-1">{displayUser.bio}</p>
+            <h2 className="font-bold">{displayUser.name || displayUser.username}</h2>
+            <p className="whitespace-pre-line text-gray-300 mt-1">{displayUser.bio || "No bio yet."}</p>
           </div>
         </div>
       </div>
@@ -156,26 +228,49 @@ const Profile = () => {
       </div>
 
       {/* Posts Grid */}
-      <div className="grid grid-cols-3 gap-1 md:gap-4">
-        {MOCK_USER_POSTS.map((post) => (
-          <div key={post.id} className="relative aspect-square group cursor-pointer bg-surface overflow-hidden">
-            <img
-              src={post.image}
-              alt="Post"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            {/* Hover overlay with stats */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300">
-              <div className="flex items-center gap-2 text-white font-bold">
-                <span className="text-xl">♥</span> {post.likes}
-              </div>
-              <div className="flex items-center gap-2 text-white font-bold">
-                <span className="text-xl">💬</span> {post.comments}
+      {posts.length > 0 ? (
+        <div className="grid grid-cols-3 gap-1 md:gap-4">
+          {posts.map((post) => (
+            <div key={post._id} className="relative aspect-square group cursor-pointer bg-surface overflow-hidden rounded-xl">
+              {post.type === 'reel' ? (
+                <video 
+                  src={post.imageUrl} 
+                  className="w-full h-full object-cover" 
+                  muted 
+                  loop
+                  playsInline
+                  onMouseOver={(e) => e.target.play().catch(err => console.log(err))}
+                  onMouseOut={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                />
+              ) : (
+                <img
+                  src={post.imageUrl}
+                  alt="Post"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              )}
+              {/* Hover overlay with stats */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300">
+                <div className="flex items-center gap-2 text-white font-bold">
+                  <span className="text-xl text-primary-pink">♥</span> {post.likeCount || 0}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+          <ImageIcon size={48} className="mb-3 text-gray-600" />
+          <p className="text-sm font-semibold">No Posts Yet</p>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal 
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onUpdateSuccess={fetchProfileAndPosts}
+      />
     </div>
   );
 };

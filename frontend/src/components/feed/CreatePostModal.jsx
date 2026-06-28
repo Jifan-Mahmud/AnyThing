@@ -20,6 +20,8 @@ const CreatePostModal = ({ isOpen, onClose }) => {
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [activeFilter, setActiveFilter] = useState('Normal');
   const [isMusicPanelOpen, setIsMusicPanelOpen] = useState(false);
+  const [fileObject, setFileObject] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -30,6 +32,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
     if (file) {
       const type = file.type.startsWith('video/') ? 'video' : 'image';
       setMediaType(type);
+      setFileObject(file);
       if (type === 'video') setPostType('reel');
       else setPostType('post');
       setMediaPreview(URL.createObjectURL(file));
@@ -41,17 +44,47 @@ const CreatePostModal = ({ isOpen, onClose }) => {
     setStep('upload');
     setCaption('');
     setMediaPreview(null);
+    setFileObject(null);
     setSelectedMusic(null);
     setActiveFilter('Normal');
     setIsMusicPanelOpen(false);
+    setUploading(false);
     onClose();
   };
 
-  const handleShare = () => {
-    setTimeout(() => {
-      toast.success(`${postType === 'reel' ? 'Reel' : 'Post'} shared successfully!`);
-      resetModal();
-    }, 800);
+  const handleShare = async () => {
+    if (!fileObject) {
+      toast.error("Please select a file first");
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("image", fileObject);
+    formData.append("caption", caption);
+    formData.append("type", postType);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(`${postType === 'reel' ? 'Reel' : 'Post'} shared successfully!`);
+        resetModal();
+        window.location.reload();
+      } else {
+        toast.error(data.message || "Failed to share post");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred while sharing the post");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const triggerFileInput = () => {
@@ -73,6 +106,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
         <button 
           onClick={() => setStep(step === 'details' ? 'edit' : 'upload')}
           className="p-1 text-gray-400 hover:text-white transition-colors"
+          disabled={uploading}
         >
           <ChevronLeft size={24} />
         </button>
@@ -81,9 +115,10 @@ const CreatePostModal = ({ isOpen, onClose }) => {
         </h2>
         <button 
           onClick={() => step === 'edit' ? setStep('details') : handleShare()}
-          className="text-primary-pink font-bold hover:text-primary-pink-hover"
+          className="text-primary-pink font-bold hover:text-primary-pink-hover disabled:opacity-50"
+          disabled={uploading}
         >
-          {step === 'edit' ? 'Next' : 'Share'}
+          {step === 'edit' ? 'Next' : uploading ? 'Sharing...' : 'Share'}
         </button>
       </div>
     );

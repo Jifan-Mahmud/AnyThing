@@ -1,15 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Heart, MessageCircle, Send, MoreHorizontal, Music, Volume2, VolumeX, X, Smile } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, Music, Volume2, VolumeX, X, Smile, Loader2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Avatar from '../components/ui/Avatar';
 
-// Import local assets
+// Import local assets for fallbacks
 import reel1 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM.mp4';
 import reel2 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM (1).mp4';
 
 const MOCK_REELS = [
   {
-    id: 1,
+    id: 'mock1',
     video: reel1,
     username: 'jason_creativ',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jason',
@@ -20,7 +20,7 @@ const MOCK_REELS = [
     shares: '15K'
   },
   {
-    id: 2,
+    id: 'mock2',
     video: reel2,
     username: 'sarah_codes',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
@@ -172,16 +172,18 @@ const ReelItem = ({ reel, isActive, isMuted, toggleMute }) => {
             <Avatar src={reel.avatar} size="sm" className="border-2 border-white shadow-lg" />
           </div>
           <span className="text-white font-bold drop-shadow-md hover:underline cursor-pointer" onClick={goToProfile}>{reel.username}</span>
-          <button 
-            onClick={(e) => { e.stopPropagation(); setIsFollowing(!isFollowing); }}
-            className={`px-3 py-1 border text-xs font-bold rounded-lg transition-all ${
-              isFollowing 
-                ? 'bg-white text-black border-white' 
-                : 'bg-black/20 backdrop-blur-md text-white border-white/50 hover:bg-white hover:text-black'
-            }`}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </button>
+          {reel.username !== 'you' && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); setIsFollowing(!isFollowing); }}
+              className={`px-3 py-1 border text-xs font-bold rounded-lg transition-all ${
+                isFollowing 
+                  ? 'bg-white text-black border-white' 
+                  : 'bg-black/20 backdrop-blur-md text-white border-white/50 hover:bg-white hover:text-black'
+              }`}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </button>
+          )}
         </div>
 
         <p className="text-white text-sm mb-3 drop-shadow-md line-clamp-2">
@@ -275,9 +277,45 @@ const ReelItem = ({ reel, isActive, isMuted, toggleMute }) => {
 };
 
 const Reels = () => {
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const containerRef = useRef(null);
+
+  const fetchReels = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/posts?type=reel", { credentials: "include" });
+      const data = await res.json();
+      if (res.ok && data.success && data.data.posts?.length > 0) {
+        const mapped = data.data.posts.map(r => ({
+          id: r._id,
+          video: r.imageUrl,
+          username: r.author?.username || 'unknown',
+          avatar: r.author?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder',
+          caption: r.caption || '',
+          music: 'Original Audio',
+          likes: r.likeCount || 0,
+          comments: 0,
+          shares: 0
+        }));
+        setReels(mapped);
+      } else {
+        // Fallback to mock reels
+        setReels(MOCK_REELS);
+      }
+    } catch (err) {
+      console.error("Error fetching reels:", err);
+      setReels(MOCK_REELS);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReels();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -292,7 +330,15 @@ const Reels = () => {
       container.addEventListener('scroll', handleScroll, { passive: true });
       return () => container.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [reels]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-black">
+        <Loader2 className="animate-spin text-primary-pink" size={40} />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full bg-black flex justify-center">
@@ -302,7 +348,7 @@ const Reels = () => {
         className="h-full w-full max-w-md overflow-y-scroll snap-y snap-mandatory scroll-smooth flex flex-col hide-scrollbar relative"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {MOCK_REELS.map((reel, index) => (
+        {reels.map((reel, index) => (
           <ReelItem
             key={reel.id}
             reel={reel}

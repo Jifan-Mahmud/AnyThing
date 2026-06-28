@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Globe, MessageSquare, Code, ChevronLeft, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const EMOJIS = ['😋', '😎', '🤣', '❤️', '👍', '😒', '😄', '😍', '😂', '😁', '😉', '🙌', '🤦‍♀️', '🤩', '😴', '🤤'];
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/app');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.success) {
+      navigate('/app');
+    }
   };
 
   return (
@@ -62,6 +72,8 @@ const LoginForm = () => {
                 type="email" 
                 placeholder="Email Address"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/10 font-medium"
               />
             </div>
@@ -72,6 +84,8 @@ const LoginForm = () => {
                 type="password" 
                 placeholder="Password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/10 font-medium"
               />
             </div>
@@ -82,9 +96,10 @@ const LoginForm = () => {
 
             <button 
               type="submit"
-              className="w-full bg-primary-pink text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all transform active:scale-95 shadow-xl shadow-primary-pink/10 mt-6 flex items-center justify-center gap-2 group"
+              disabled={loading}
+              className="w-full bg-primary-pink text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all transform active:scale-95 shadow-xl shadow-primary-pink/10 mt-6 flex items-center justify-center gap-2 group disabled:opacity-50"
             >
-              Log In
+              {loading ? "Logging In..." : "Log In"}
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
