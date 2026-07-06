@@ -31,7 +31,7 @@ const ChatList = ({ users, loading, error, onSelectUser }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
-        {users && users.map(user => {
+        {users && users.filter(Boolean).map(user => {
           return (
             <div
               key={user._id}

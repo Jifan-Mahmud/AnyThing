@@ -72,7 +72,7 @@ export const getFollowers = async (req, res, next) => {
     ]);
 
     return sendSuccess(res, {
-      users: followers.map((f) => f.follower),
+      users: followers.map((f) => f.follower).filter(Boolean),
       total,
       page,
       limit,
@@ -103,7 +103,7 @@ export const getFollowing = async (req, res, next) => {
     ]);
 
     return sendSuccess(res, {
-      users: following.map((f) => f.following),
+      users: following.map((f) => f.following).filter(Boolean),
       total,
       page,
       limit,
