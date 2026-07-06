@@ -3,6 +3,14 @@
     {
       "source": "/api/:path*",
       "destination": "https://anything-os6i.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://anything-os6i.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
