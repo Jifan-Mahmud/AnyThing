@@ -30,6 +30,12 @@ const socketHandler = (io) => {
       });
     });
 
+    // --- New Post Broadcast ---
+    socket.on("newPostCreated", (post) => {
+      // Broadcast to all connected users (except sender)
+      socket.broadcast.emit("feedUpdated", post);
+    });
+
     // --- WebRTC Calling Events ---
     socket.on("call-user", ({ to, offer, type, callerName, callerAvatar }) => {
       if (onlineUsers[to]) {

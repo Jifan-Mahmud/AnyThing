@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { X, Image as ImageIcon, MapPin, Video, Film, Music, Sparkles, Type, Smile, ChevronLeft, Search, Play, Pause } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
 
 const MOCK_MUSIC = [
   { id: 1, title: 'Stay With Me', artist: 'Lofi Girl', duration: '0:30' },
@@ -11,7 +13,9 @@ const MOCK_MUSIC = [
 
 const FILTERS = ['Normal', 'Clarendon', 'Gingham', 'Moon', 'Lark', 'Reyes'];
 
-const CreatePostModal = ({ isOpen, onClose }) => {
+const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
+  const { socket } = useSocket();
+  const { user } = useAuth();
   const [step, setStep] = useState('upload'); // 'upload', 'edit', 'details'
   const [caption, setCaption] = useState('');
   const [mediaPreview, setMediaPreview] = useState(null);
@@ -74,8 +78,13 @@ const CreatePostModal = ({ isOpen, onClose }) => {
       const data = await res.json();
       if (res.ok && data.success) {
         toast.success(`${postType === 'reel' ? 'Reel' : 'Post'} shared successfully!`);
+        // Emit socket event so all OTHER online users get the new post
+        if (socket) {
+          socket.emit("newPostCreated", data.data);
+        }
+        // Dispatch a browser event so Feed.jsx adds the post for the creator instantly
+        window.dispatchEvent(new CustomEvent('ownPostCreated', { detail: data.data }));
         resetModal();
-        window.location.reload();
       } else {
         toast.error(data.message || "Failed to share post");
       }

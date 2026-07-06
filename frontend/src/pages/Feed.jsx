@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StoriesBar from '../components/feed/StoriesBar';
 import PostCard from '../components/feed/PostCard';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useSocket } from '../context/SocketContext';
 
 // Import local assets for mock story/reel fallbacks
 import reel1 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM.mp4';
@@ -30,6 +31,7 @@ const SUGGESTIONS = [
 const Feed = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { socket } = useSocket();
   const [posts, setPosts] = useState([]);
   const [reels, setReels] = useState(MOCK_REELS); // always start with mock reels visible
   const [stories, setStories] = useState([]);
@@ -116,6 +118,48 @@ const Feed = () => {
       setLoading(false);
     }
   }, [user]);
+
+  // Handle new post from CreatePostModal (own post)
+  const handleNewPost = useCallback((newPost) => {
+    const mapped = {
+      id: newPost._id,
+      user: {
+        id: newPost.author?._id,
+        username: newPost.author?.username || user?.username || 'you',
+        avatar: newPost.author?.avatarUrl || user?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=you',
+        hasStory: false,
+      },
+      location: '',
+      image: newPost.imageUrl,
+      likes: 0,
+      comments: 0,
+      caption: newPost.caption || '',
+      timeAgo: 'Just now',
+      likedByMe: false,
+      type: newPost.type,
+      isFollowing: false,
+    };
+    setPosts(prev => [mapped, ...prev]);
+  }, [user]);
+
+  // Listen for real-time posts from other users via socket
+  useEffect(() => {
+    if (!socket) return;
+    const handleFeedUpdate = (newPost) => {
+      handleNewPost(newPost);
+    };
+    socket.on('feedUpdated', handleFeedUpdate);
+    return () => socket.off('feedUpdated', handleFeedUpdate);
+  }, [socket, handleNewPost]);
+
+  // Listen for own post created (browser custom event from CreatePostModal)
+  useEffect(() => {
+    const handleOwnPost = (e) => {
+      handleNewPost(e.detail);
+    };
+    window.addEventListener('ownPostCreated', handleOwnPost);
+    return () => window.removeEventListener('ownPostCreated', handleOwnPost);
+  }, [handleNewPost]);
 
   if (loading) {
     return (
