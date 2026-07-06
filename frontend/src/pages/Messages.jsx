@@ -12,7 +12,7 @@ const Messages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const socket = useSocket();
+  const { socket } = useSocket();
   const { user } = useAuth();
 
   useEffect(() => {

@@ -16,7 +16,7 @@ const servers = {
 };
 
 export const CallProvider = ({ children }) => {
-  const socket = useSocket();
+  const { socket } = useSocket();
   const { user: currentUser } = useAuth();
 
   const [callState, setCallState] = useState("idle"); // 'idle' | 'incoming' | 'outgoing' | 'connected'

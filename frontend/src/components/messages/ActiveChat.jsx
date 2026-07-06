@@ -11,7 +11,7 @@ const ActiveChat = ({ conversation, messages, onBack }) => {
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const messagesEndRef = useRef(null);
-  const socket = useSocket();
+  const { socket } = useSocket();
   const { user } = useAuth();
   const { startCall } = useCall();
   const myAvatar = user?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=me';
