@@ -3,6 +3,7 @@ import { Outlet, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileNav from './MobileNav';
 import CreatePostModal from '../feed/CreatePostModal';
+import CallOverlay from '../messages/CallOverlay';
 import { Heart, MessageSquare } from 'lucide-react';
 
 const AppLayout = () => {
@@ -42,6 +43,7 @@ const AppLayout = () => {
       </div>
 
       <CreatePostModal isOpen={isCreatePostOpen} onClose={() => setIsCreatePostOpen(false)} />
+      <CallOverlay />
     </div>
   );
 };

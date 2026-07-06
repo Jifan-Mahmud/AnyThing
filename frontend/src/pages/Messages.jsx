@@ -1,26 +1,105 @@
-import React, { useState } from 'react';
-import ChatList, { MOCK_CHATS } from '../components/messages/ChatList';
+import React, { useState, useEffect } from 'react';
+import ChatList from '../components/messages/ChatList';
 import ActiveChat from '../components/messages/ActiveChat';
+import { apiClient } from '../utils/apiClient';
+import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
 
 const Messages = () => {
-  const [activeChatId, setActiveChatId] = useState(null); // Default to null for mobile list view
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [following, setFollowing] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const socket = useSocket();
+  const { user } = useAuth();
 
-  const activeChat = MOCK_CHATS.find(chat => chat.id === activeChatId);
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      try {
+        const response = await apiClient.get('/users/me/following');
+        console.log(response.data.data.users);
+        setFollowing(response.data.data.users);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFollowing();
+  }, []);
+
+  useEffect(() => {
+    if (activeConversationId) {
+      const fetchConversation = async () => {
+        try {
+          const response = await apiClient.get(
+            `/conversations/${activeConversationId}`
+          );
+          setActiveConversation(response.data.data);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchConversation();
+
+      const fetchMessages = async () => {
+        try {
+          const response = await apiClient.get(
+            `/messages/${activeConversationId}`
+          );
+          setMessages(response.data.data);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+      fetchMessages();
+    }
+  }, [activeConversationId]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('newMessage', (message) => {
+        if (message.conversationId === activeConversationId) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        }
+      });
+    }
+  }, [socket, activeConversationId]);
+
+  const handleSelectUser = async (selectedUser) => {
+    try {
+      const response = await apiClient.post('/conversations', {
+        participants: [user._id, selectedUser._id],
+      });
+      setActiveConversationId(response.data.data._id);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="flex h-full w-full">
       {/* Chat List - Hidden on mobile if a chat is active */}
-      <div className={`h-full ${activeChatId ? 'hidden md:block' : 'w-full'} md:w-80 lg:w-96 shrink-0`}>
+      <div className={`h-full ${activeConversationId ? 'hidden md:block' : 'w-full'} md:w-80 lg:w-96 shrink-0`}>
         <ChatList 
-          activeChatId={activeChatId} 
-          onSelectChat={setActiveChatId} 
+          users={following}
+          loading={loading}
+          error={error}
+          onSelectUser={handleSelectUser} 
         />
       </div>
 
       {/* Active Chat - Hidden on mobile if NO chat is active */}
-      <div className={`flex-1 h-full ${!activeChatId ? 'hidden md:flex' : 'w-full flex'}`}>
-        {activeChat ? (
-          <ActiveChat chat={activeChat} onBack={() => setActiveChatId(null)} />
+      <div className={`flex-1 h-full ${!activeConversationId ? 'hidden md:flex' : 'w-full flex'}`}>
+        {activeConversation ? (
+          <ActiveChat 
+            conversation={activeConversation}
+            messages={messages} 
+            onBack={() => setActiveConversationId(null)} 
+          />
         ) : (
           <div className="hidden md:flex flex-col items-center justify-center w-full h-full bg-bg-darker text-gray-400">
             <div className="w-24 h-24 rounded-full border-2 border-white/10 flex items-center justify-center mb-4">

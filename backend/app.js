@@ -11,6 +11,9 @@ import userRoutes from "./src/routes/user.routes.js";
 import followRoutes from "./src/routes/follow.routes.js";
 import postRoutes from "./src/routes/post.routes.js";
 import commentRoutes from "./src/routes/comment.routes.js";
+import storyRoutes from "./src/routes/story.routes.js";
+import messageRoutes from "./src/routes/message.routes.js";
+import conversationRoutes from "./src/routes/conversation.routes.js";
 import { getUserPosts } from "./src/controllers/post.controller.js";
 
 // ── Middleware imports ────────────────────────────────────────────────────────
@@ -47,9 +50,20 @@ app.get("/api/health", (_req, res) => {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 // Auth: better-auth handles /api/auth/* internally.
-// Must be mounted directly on app (not inside a Router) so that
-// toNodeHandler receives the full path — Express 4 + better-auth requirement.
-app.all("/api/auth/*", authLimiter, authHandler);
+// toNodeHandler bypasses Express middleware, so we handle CORS + preflight
+// in a single app.all before delegating to better-auth.
+const FRONTEND = process.env.FRONTEND_URL || "http://localhost:5173";
+
+app.all("/api/auth/*", authLimiter, (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", FRONTEND);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
+  // Return 204 immediately for browser preflight requests
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  // Pass all other requests to better-auth
+  return authHandler(req, res, next);
+});
 
 // Users: /api/users/* + /api/me
 app.use("/api/users", userRoutes);
@@ -65,9 +79,18 @@ app.use("/api/follow", followRoutes);
 // Posts: /api/posts/*
 app.use("/api/posts", postRoutes);
 
+// Stories: /api/stories/*
+app.use("/api/stories", storyRoutes);
+
 // Comments: /api/posts/:postId/comments + /api/comments/:id
 // (comment router manages its own full path prefixes)
 app.use("/api", commentRoutes);
+
+// Messages: /api/messages/*
+app.use("/api/messages", messageRoutes);
+
+// Conversations: /api/conversations/*
+app.use("/api/conversations", conversationRoutes);
 
 // User posts: GET /api/users/:userId/posts
 app.get("/api/users/:userId/posts", getUserPosts);

@@ -32,6 +32,9 @@ const Feed = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [reels, setReels] = useState(MOCK_REELS); // always start with mock reels visible
+  const [stories, setStories] = useState([]);
+  const [myStory, setMyStory] = useState(null);
+  const [hasMyStory, setHasMyStory] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchFeedAndReels = async () => {
@@ -45,8 +48,8 @@ const Feed = () => {
       if (feedRes.ok && feedData.success && feedData.data.posts?.length > 0) {
         feedPosts = feedData.data.posts;
       } else {
-        // Fallback: fetch all public posts of type 'post'
-        const publicRes = await fetch("http://localhost:5000/api/posts?type=post", { credentials: "include" });
+        // Fallback: fetch all public posts
+        const publicRes = await fetch("http://localhost:5000/api/posts", { credentials: "include" });
         const publicData = await publicRes.json();
         if (publicRes.ok && publicData.success) {
           feedPosts = publicData.data.posts || [];
@@ -57,6 +60,7 @@ const Feed = () => {
       const mappedPosts = feedPosts.map(p => ({
         id: p._id,
         user: {
+          id: p.author?._id,
           username: p.author?.username || 'unknown',
           avatar: p.author?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder',
           hasStory: false,
@@ -67,7 +71,9 @@ const Feed = () => {
         comments: 0,
         caption: p.caption || '',
         timeAgo: new Date(p.createdAt).toLocaleDateString(),
-        likedByMe: p.likedByMe || false
+        likedByMe: p.likedByMe || false,
+        type: p.type,
+        isFollowing: p.isFollowing
       }));
 
       setPosts(mappedPosts);
@@ -79,6 +85,21 @@ const Feed = () => {
         setReels(reelsData.data.posts);
       } else {
         setReels(MOCK_REELS);
+      }
+
+      // 3. Fetch backend stories
+      const storiesRes = await fetch("http://localhost:5000/api/stories", { credentials: "include" });
+      const storiesData = await storiesRes.json();
+      if (storiesRes.ok && storiesData.success) {
+        const allStories = storiesData.data || [];
+        
+        // Filter out current user's active stories to display on 'Your Story' bubble
+        const myStoryObj = allStories.find(s => s.id === user?._id);
+        const otherStories = allStories.filter(s => s.id !== user?._id);
+        
+        setStories(otherStories);
+        setMyStory(myStoryObj || null);
+        setHasMyStory(!!(myStoryObj && myStoryObj.stories?.length > 0));
       }
     } catch (err) {
       console.error("Error loading feed:", err);
@@ -154,9 +175,13 @@ const Feed = () => {
     <div className="flex h-full w-full justify-center">
       {/* Main Feed Column */}
       <div className="w-full max-w-2xl px-0 md:px-8 py-2 md:py-6 overflow-x-hidden">
-        <div className="px-4 md:px-0">
-          <StoriesBar stories={MOCK_STORIES} />
-        </div>
+          <StoriesBar 
+            stories={stories} 
+            currentUser={user} 
+            hasMyStory={hasMyStory}
+            myStory={myStory}
+            onStoryUploaded={() => fetchFeedAndReels()}
+          />
 
         <div className="mt-4 md:mt-8 space-y-6">
           {posts.length > 0 ? (

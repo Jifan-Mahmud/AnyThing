@@ -25,8 +25,8 @@ router.get("/search", searchUsers);
 // ── User posts — handled in post.routes.js at /api/users/:userId/posts ────────
 
 // ── Follower / Following lists (public) ───────────────────────────────────────
-router.get("/:userId/followers", getFollowers);
-router.get("/:userId/following", getFollowing);
+router.get("/me/followers", requireAuth, getFollowers);
+router.get("/me/following", requireAuth, getFollowing);
 
 // ── Public profile by username ────────────────────────────────────────────────
 // MUST be last — catch-all param route

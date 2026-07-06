@@ -12,13 +12,14 @@ export const createPostSchema = z.object({
   type: z.enum(["post", "reel"]).optional().default("post"),
 });
 
-// ── Helper: enrich posts with like data ──────────────────────────────────────
+// ── Helper: enrich posts with like data and follow status ──────────────────────
 const enrichPosts = async (posts, currentUserId) => {
   if (!posts.length) return [];
 
   const postIds = posts.map((p) => p._id);
+  const authorIds = posts.map((p) => p.author?._id || p.author).filter(Boolean);
 
-  const [likeCounts, userLikes] = await Promise.all([
+  const [likeCounts, userLikes, followedUsers] = await Promise.all([
     Like.aggregate([
       { $match: { post: { $in: postIds } } },
       { $group: { _id: "$post", count: { $sum: 1 } } },
@@ -26,17 +27,23 @@ const enrichPosts = async (posts, currentUserId) => {
     currentUserId
       ? Like.find({ post: { $in: postIds }, user: currentUserId }).select("post")
       : Promise.resolve([]),
+    currentUserId
+      ? Follow.find({ follower: currentUserId, following: { $in: authorIds } }).select("following")
+      : Promise.resolve([]),
   ]);
 
   const likeCountMap = Object.fromEntries(likeCounts.map((l) => [l._id.toString(), l.count]));
   const likedSet = new Set(userLikes.map((l) => l.post.toString()));
+  const followedSet = new Set(followedUsers.map((f) => f.following.toString()));
 
   return posts.map((post) => {
     const obj = post.toObject ? post.toObject() : post;
+    const authorId = obj.author?._id || obj.author;
     return {
       ...obj,
       likeCount: likeCountMap[obj._id.toString()] || 0,
       likedByMe: likedSet.has(obj._id.toString()),
+      isFollowing: authorId ? followedSet.has(authorId.toString()) : false,
     };
   });
 };
@@ -81,15 +88,20 @@ export const getFeed = async (req, res, next) => {
     // Get IDs of users the current user follows
     const following = await Follow.find({ follower: req.user._id }).select("following");
     const followingIds = following.map((f) => f.following);
-    const authorIds = [req.user._id, ...followingIds];
+
+    // If the user doesn't follow anyone, show posts from ALL users (public feed).
+    // Otherwise, show their own posts + posts from users they follow.
+    const filter = followingIds.length > 0
+      ? { author: { $in: [req.user._id, ...followingIds] } }
+      : {};
 
     const [posts, total] = await Promise.all([
-      Post.find({ author: { $in: authorIds } })
+      Post.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("author", "username name avatarUrl"),
-      Post.countDocuments({ author: { $in: authorIds } }),
+      Post.countDocuments(filter),
     ]);
 
     const enriched = await enrichPosts(posts, req.user._id);

@@ -66,12 +66,31 @@ const StoryViewerModal = ({ isOpen, onClose, storyUser }) => {
           <span className="text-white/70 text-xs shadow-sm">2h</span>
         </div>
 
-        {/* Story Image/Video (Mock) */}
-        <img 
-          src={`https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop&seed=${storyUser.id}`} 
-          alt="Story content" 
-          className="w-full h-full object-cover"
-        />
+        {/* Story Image/Video */}
+        {storyUser.stories && storyUser.stories.length > 0 ? (
+          storyUser.stories[0].mediaType === 'video' || storyUser.stories[0].mediaUrl.endsWith('.mp4') ? (
+            <video 
+              src={storyUser.stories[0].mediaUrl} 
+              className="w-full h-full object-cover animate-in fade-in duration-300" 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+            />
+          ) : (
+            <img 
+              src={storyUser.stories[0].mediaUrl} 
+              alt="Story content" 
+              className="w-full h-full object-cover animate-in fade-in duration-300"
+            />
+          )
+        ) : (
+          <img 
+            src={`https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop&seed=${storyUser.id}`} 
+            alt="Story content" 
+            className="w-full h-full object-cover"
+          />
+        )}
 
         {/* Tap areas for next/prev */}
         <div className="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer" onClick={handlePrev} />

@@ -8,15 +8,35 @@ const MOCK_MUSIC = [
   { id: 3, title: 'Blinding Lights', artist: 'The Weeknd' },
 ];
 
-const StoryEditorModal = ({ isOpen, onClose, mediaFile }) => {
+const StoryEditorModal = ({ isOpen, onClose, mediaFile, onStoryShared }) => {
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
 
   if (!isOpen || !mediaFile) return null;
 
-  const handleShare = () => {
-    toast.success('Shared to Your Story!');
-    onClose();
+  const handleShare = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("media", mediaFile);
+
+      const res = await fetch("http://localhost:5000/api/stories", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Shared to Your Story! 🌟');
+        if (onStoryShared) onStoryShared(data.data);
+        onClose();
+      } else {
+        toast.error(data.message || "Failed to upload story");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error: Failed to share story");
+    }
   };
 
   const mediaUrl = URL.createObjectURL(mediaFile);

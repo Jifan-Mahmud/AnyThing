@@ -1,18 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Smile } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Avatar from '../ui/Avatar';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const PostCard = ({ post }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user: currentUser } = useAuth();
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [recentComments, setRecentComments] = useState([]);
   const [showCommentBox, setShowCommentBox] = useState(false);
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(post.isFollowing || false);
+
+  useEffect(() => {
+    setIsFollowing(post.isFollowing || false);
+  }, [post.isFollowing]);
+
+  const handleFollowToggle = async () => {
+    if (!currentUser) {
+      toast.error("Please login to follow creators");
+      return;
+    }
+    
+    try {
+      const url = `http://localhost:5000/api/follow/${post.user.id}`;
+      const method = isFollowing ? "DELETE" : "POST";
+      const res = await fetch(url, {
+        method,
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsFollowing(!isFollowing);
+        toast.success(data.message || (isFollowing ? "Unfollowed creator" : "Following creator!"));
+      } else {
+        toast.error(data.message || "Failed to complete request");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to toggle follow status");
+    }
+  };
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
@@ -44,32 +77,48 @@ const PostCard = ({ post }) => {
             <p className="text-xs text-gray-400">{post.location || post.timeAgo}</p>
           </div>
         </div>
-        {post.user.username !== 'jason_creativ' && (
-          <button 
-            onClick={() => setIsFollowing(!isFollowing)}
-            className={`text-sm font-bold transition-colors ${
-              isFollowing 
-                ? 'text-gray-400 hover:text-white' 
-                : 'text-primary-pink hover:text-primary-pink-hover'
-            }`}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
+        {currentUser && post.user.id === currentUser._id ? (
+          <button className="text-gray-400 hover:text-white transition-colors p-1 rounded-full hover:bg-white/5">
+            <MoreHorizontal size={20} />
           </button>
+        ) : (
+          post.user.username !== 'jason_creativ' && (
+            <button 
+              onClick={handleFollowToggle}
+              className={`text-sm font-bold transition-colors ${
+                isFollowing 
+                  ? 'text-gray-400 hover:text-white' 
+                  : 'text-primary-pink hover:text-primary-pink-hover'
+              }`}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </button>
+          )
         )}
       </div>
 
-      {/* Post Image */}
+      {/* Post Image / Video */}
       <div
-        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] bg-bg-darker cursor-pointer group"
+        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] bg-bg-darker cursor-pointer group animate-in fade-in duration-300"
         onDoubleClick={() => setLiked(true)}
       >
-        <img
-          src={post.image}
-          alt="Post content"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-        />
+        {post.type === 'reel' || post.image?.endsWith('.mp4') || post.image?.endsWith('.mov') || post.image?.endsWith('.webm') ? (
+          <video
+            src={post.image}
+            className="w-full h-full object-cover"
+            controls
+            playsInline
+            muted
+          />
+        ) : (
+          <img
+            src={post.image}
+            alt="Post content"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+          />
+        )}
         {/* Heart Overlay Animation */}
-        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ${liked ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 z-10 ${liked ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
           <Heart size={100} className="text-white drop-shadow-2xl fill-white" />
         </div>
       </div>

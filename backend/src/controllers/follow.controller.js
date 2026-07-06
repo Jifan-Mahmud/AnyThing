@@ -63,12 +63,12 @@ export const getFollowers = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const [followers, total] = await Promise.all([
-      Follow.find({ following: req.params.userId })
+      Follow.find({ following: req.user._id })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("follower", "username name avatarUrl bio"),
-      Follow.countDocuments({ following: req.params.userId }),
+      Follow.countDocuments({ following: req.user._id }),
     ]);
 
     return sendSuccess(res, {
@@ -94,12 +94,12 @@ export const getFollowing = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const [following, total] = await Promise.all([
-      Follow.find({ follower: req.params.userId })
+      Follow.find({ follower: req.user._id })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("following", "username name avatarUrl bio"),
-      Follow.countDocuments({ follower: req.params.userId }),
+      Follow.countDocuments({ follower: req.user._id }),
     ]);
 
     return sendSuccess(res, {
