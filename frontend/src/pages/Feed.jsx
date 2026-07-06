@@ -42,14 +42,14 @@ const Feed = () => {
     try {
       // 1. Try to fetch followed feed posts
       let feedPosts = [];
-      const feedRes = await fetch("http://localhost:5000/api/posts/feed", { credentials: "include" });
+      const feedRes = await fetch("/api/posts/feed", { credentials: "include" });
       const feedData = await feedRes.json();
 
       if (feedRes.ok && feedData.success && feedData.data.posts?.length > 0) {
         feedPosts = feedData.data.posts;
       } else {
         // Fallback: fetch all public posts
-        const publicRes = await fetch("http://localhost:5000/api/posts", { credentials: "include" });
+        const publicRes = await fetch("/api/posts", { credentials: "include" });
         const publicData = await publicRes.json();
         if (publicRes.ok && publicData.success) {
           feedPosts = publicData.data.posts || [];
@@ -79,7 +79,7 @@ const Feed = () => {
       setPosts(mappedPosts);
 
       // 2. Fetch real reels — fall back to mock if none in DB
-      const reelsRes = await fetch("http://localhost:5000/api/posts?type=reel", { credentials: "include" });
+      const reelsRes = await fetch("/api/posts?type=reel", { credentials: "include" });
       const reelsData = await reelsRes.json();
       if (reelsRes.ok && reelsData.success && reelsData.data.posts?.length > 0) {
         setReels(reelsData.data.posts);
@@ -88,7 +88,7 @@ const Feed = () => {
       }
 
       // 3. Fetch backend stories
-      const storiesRes = await fetch("http://localhost:5000/api/stories", { credentials: "include" });
+      const storiesRes = await fetch("/api/stories", { credentials: "include" });
       const storiesData = await storiesRes.json();
       if (storiesRes.ok && storiesData.success) {
         const allStories = storiesData.data || [];

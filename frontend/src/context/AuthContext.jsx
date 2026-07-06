@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 const AuthContext = createContext(null);
 
-export const API_BASE = "http://localhost:5000/api";
+export const API_BASE = "/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

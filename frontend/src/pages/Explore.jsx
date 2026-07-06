@@ -17,7 +17,7 @@ const Explore = () => {
   const fetchExplorePosts = async () => {
     setLoading(true);
     try {
-      let url = "http://localhost:5000/api/posts";
+      let url = "/api/posts";
       // If there is a search query, we can query users or posts.
       // For now, let's load all posts/reels.
       const res = await fetch(url, { credentials: "include" });
@@ -65,7 +65,7 @@ const Explore = () => {
       setLoading(true);
       try {
         // Search by username
-        const res = await fetch(`http://localhost:5000/api/users/search?q=${searchQuery}`, { credentials: "include" });
+        const res = await fetch(`/api/users/search?q=${searchQuery}`, { credentials: "include" });
         const data = await res.json();
         if (res.ok && data.success && data.data.users?.length > 0) {
           // Map searched users to a mock post list (representing profiles found)

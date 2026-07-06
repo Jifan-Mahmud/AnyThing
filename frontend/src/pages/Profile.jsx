@@ -27,7 +27,7 @@ const Profile = () => {
 
       if (isSelf) {
         // Fetch current user details (to get latest stats)
-        const res = await fetch(`http://localhost:5000/api/me`, { credentials: "include" });
+        const res = await fetch(`/api/me`, { credentials: "include" });
         const data = await res.json();
         if (res.ok && data.success) {
           targetUser = data.data;
@@ -36,7 +36,7 @@ const Profile = () => {
         }
       } else {
         // Fetch public profile by username
-        const res = await fetch(`http://localhost:5000/api/users/${passedUser.username}`, { credentials: "include" });
+        const res = await fetch(`/api/users/${passedUser.username}`, { credentials: "include" });
         const data = await res.json();
         if (res.ok && data.success) {
           targetUser = data.data;
@@ -48,7 +48,7 @@ const Profile = () => {
 
       // Fetch posts for this user
       if (targetUser?._id) {
-        const res = await fetch(`http://localhost:5000/api/users/${targetUser._id}/posts`, { credentials: "include" });
+        const res = await fetch(`/api/users/${targetUser._id}/posts`, { credentials: "include" });
         const data = await res.json();
         if (res.ok && data.success) {
           setPosts(data.data.posts || []);
@@ -79,7 +79,7 @@ const Profile = () => {
     if (!profileData) return;
     try {
       const method = isFollowing ? "DELETE" : "POST";
-      const res = await fetch(`http://localhost:5000/api/follow/${profileData._id}`, {
+      const res = await fetch(`/api/follow/${profileData._id}`, {
         method,
         credentials: "include"
       });

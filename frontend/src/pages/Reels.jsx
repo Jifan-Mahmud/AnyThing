@@ -286,7 +286,7 @@ const Reels = () => {
   const fetchReels = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/posts?type=reel", { credentials: "include" });
+      const res = await fetch("/api/posts?type=reel", { credentials: "include" });
       const data = await res.json();
       if (res.ok && data.success && data.data.posts?.length > 0) {
         const mapped = data.data.posts.map(r => ({

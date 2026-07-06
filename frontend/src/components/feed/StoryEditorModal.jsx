@@ -19,7 +19,7 @@ const StoryEditorModal = ({ isOpen, onClose, mediaFile, onStoryShared }) => {
       const formData = new FormData();
       formData.append("media", mediaFile);
 
-      const res = await fetch("http://localhost:5000/api/stories", {
+      const res = await fetch("/api/stories", {
         method: "POST",
         body: formData,
         credentials: "include",

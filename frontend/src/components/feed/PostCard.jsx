@@ -28,7 +28,7 @@ const PostCard = ({ post }) => {
     }
     
     try {
-      const url = `http://localhost:5000/api/follow/${post.user.id}`;
+      const url = `/api/follow/${post.user.id}`;
       const method = isFollowing ? "DELETE" : "POST";
       const res = await fetch(url, {
         method,

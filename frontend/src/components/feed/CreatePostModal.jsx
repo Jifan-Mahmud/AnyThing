@@ -65,7 +65,7 @@ const CreatePostModal = ({ isOpen, onClose }) => {
     formData.append("type", postType);
 
     try {
-      const res = await fetch("http://localhost:5000/api/posts", {
+      const res = await fetch("/api/posts", {
         method: "POST",
         body: formData,
         credentials: "include"
