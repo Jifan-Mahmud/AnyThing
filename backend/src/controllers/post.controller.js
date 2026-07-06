@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from "../config/cloudinary.js";
 import { upload } from "../middlewares/upload.js";
 import { z } from "zod";
 import Post from "../models/Post.js";
@@ -58,8 +59,9 @@ export const createPost = async (req, res, next) => {
   try {
     if (!req.file) return sendError(res, "Image is required", 400);
 
-    // Build image URL — in production swap for Cloudinary secure_url
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    // Upload the file to Cloudinary
+    const uploadResult = await uploadToCloudinary(req.file.path, "posts");
+    const imageUrl = uploadResult.secure_url;
 
     const post = await Post.create({
       author: req.user._id,

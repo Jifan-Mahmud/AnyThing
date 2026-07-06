@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from "../config/cloudinary.js";
 import Story from "../models/Story.js";
 import Follow from "../models/Follow.js";
 import User from "../models/User.js";
@@ -11,7 +12,8 @@ export const createStory = async (req, res, next) => {
   try {
     if (!req.file) return sendError(res, "Media file is required", 400);
 
-    const mediaUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    const uploadResult = await uploadToCloudinary(req.file.path, "stories");
+    const mediaUrl = uploadResult.secure_url;
     const mediaType = req.file.mimetype.startsWith("video/") ? "video" : "image";
 
     const story = await Story.create({

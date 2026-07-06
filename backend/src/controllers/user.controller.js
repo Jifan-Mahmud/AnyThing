@@ -1,3 +1,4 @@
+import { uploadToCloudinary } from "../config/cloudinary.js";
 import { z } from "zod";
 import User from "../models/User.js";
 import Follow from "../models/Follow.js";
@@ -85,7 +86,8 @@ export const updateMe = async (req, res, next) => {
     const updates = { ...req.body }; // already validated by zod middleware
 
     if (req.file) {
-      updates.avatarUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+      const uploadResult = await uploadToCloudinary(req.file.path, "avatars");
+      updates.avatarUrl = uploadResult.secure_url;
     }
 
     // Prevent duplicate username
