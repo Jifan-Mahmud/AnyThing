@@ -112,7 +112,9 @@ const socketHandler = (io, onlineUsers = {}) => {
     });
 
     socket.on("disconnect", () => {
-      delete onlineUsers[userId];
+      if (onlineUsers[userId] === socket.id) {
+        delete onlineUsers[userId];
+      }
       io.emit("getOnlineUsers", Object.keys(onlineUsers));
     });
   });
