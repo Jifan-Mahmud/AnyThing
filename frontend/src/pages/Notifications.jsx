@@ -1,78 +1,271 @@
-import React from 'react';
-import Avatar from '../components/ui/Avatar';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, UserPlus, ImageIcon, Film, BookImage, Phone, Video, Loader2, Bell, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
+import { toast } from 'react-toastify';
 
-const MOCK_NOTIFICATIONS = [
-  { id: 1, type: 'like', user: 'sarah_codes', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', time: '2h', postImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=200&auto=format&fit=crop', text: 'liked your photo.' },
-  { id: 2, type: 'follow', user: 'mike_dev', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike', time: '4h', isFollowing: false, text: 'started following you.' },
-  { id: 3, type: 'comment', user: 'alex_design', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', time: '5h', postImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=200&auto=format&fit=crop', text: 'commented: "This layout is absolutely fire! 🔥"' },
-  { id: 4, type: 'like', user: 'ui_daily', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=UI', time: '1d', postImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=200&auto=format&fit=crop', text: 'liked your reel.' },
-  { id: 5, type: 'follow', user: 'tech_guru', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tech', time: '1d', isFollowing: true, text: 'started following you.' },
-  { id: 6, type: 'mention', user: 'jason_creativ', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jason', time: '2d', postImage: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=200&auto=format&fit=crop', text: 'mentioned you in a comment: "@user check this out!"' }
-];
+// Helper: format relative time
+const timeAgo = (date) => {
+  const now = new Date();
+  const diff = Math.floor((now - new Date(date)) / 1000);
+  if (diff < 60) return `${diff}s`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
+  return `${Math.floor(diff / 604800)}w`;
+};
+
+// Icon per type
+const NotifIcon = ({ type }) => {
+  const base = "w-5 h-5";
+  switch (type) {
+    case 'like':    return <Heart className={`${base} text-red-400`} fill="currentColor" />;
+    case 'follow':  return <UserPlus className={`${base} text-blue-400`} />;
+    case 'comment': return <ImageIcon className={`${base} text-yellow-400`} />;
+    case 'post':    return <ImageIcon className={`${base} text-primary-pink`} />;
+    case 'reel':    return <Film className={`${base} text-purple-400`} />;
+    case 'story':   return <BookImage className={`${base} text-green-400`} />;
+    default:        return <Bell className={`${base} text-gray-400`} />;
+  }
+};
+
+// Text per type
+const notifText = (type, senderName) => {
+  switch (type) {
+    case 'follow':  return `${senderName} started following you.`;
+    case 'like':    return `${senderName} liked your post.`;
+    case 'comment': return `${senderName} commented on your post.`;
+    case 'post':    return `${senderName} shared a new post.`;
+    case 'reel':    return `${senderName} shared a new reel.`;
+    case 'story':   return `${senderName} added a new story.`;
+    default:        return `${senderName} did something.`;
+  }
+};
 
 const Notifications = () => {
-  return (
-    <div className="flex flex-col h-full w-full max-w-2xl mx-auto px-4 py-8 md:px-8">
-      <div className="flex justify-between items-end mb-10">
-        <h1 className="text-3xl font-black italic tracking-tighter text-white">
-          Notifi<span className="text-primary-pink">cations</span>
-        </h1>
-        <button className="text-xs font-bold uppercase tracking-widest text-primary-pink hover:text-white transition-colors">Mark all as read</button>
-      </div>
-      
-      <div className="space-y-10">
-        <div>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-6 flex items-center gap-4">
-            Earlier
-            <div className="flex-1 h-px bg-white/5" />
-          </h2>
-          
-          <div className="space-y-6">
-            {MOCK_NOTIFICATIONS.map((notif) => (
-              <div key={notif.id} className="flex items-center gap-4 group cursor-default p-2 rounded-3xl hover:bg-white/5 transition-all duration-300">
-                {/* User Avatar with Ring */}
-                <div className="p-0.5 rounded-full bg-gradient-to-tr from-primary-pink to-purple-500 shadow-lg">
-                   <Avatar src={notif.avatar} size="md" className="border-2 border-bg-dark" />
-                </div>
-                
-                {/* Notification Text */}
-                <div className="flex-1 text-sm leading-snug">
-                  <span className="font-bold text-white hover:text-primary-pink cursor-pointer transition-colors mr-1.5">
-                    {notif.user}
-                  </span>
-                  <span className="text-gray-400 font-medium italic">
-                    {notif.text}
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-gray-600 block mt-1">
-                    {notif.time} ago
-                  </span>
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { socket } = useSocket();
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [followingMap, setFollowingMap] = useState({});
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const res = await fetch("/api/notifications?limit=50", { credentials: "include" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setNotifications(data.data.notifications || []);
+        setUnreadCount(data.data.unreadCount || 0);
+      }
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) fetchNotifications();
+  }, [user, fetchNotifications]);
+
+  // Real-time notifications via socket
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (notif) => {
+      setNotifications(prev => [notif, ...prev]);
+      setUnreadCount(prev => prev + 1);
+      toast.info(`🔔 ${notifText(notif.type, notif.sender?.username || 'Someone')}`, {
+        autoClose: 3000,
+        onClick: () => navigate('/app/notifications'),
+      });
+    };
+    socket.on('newNotification', handler);
+    return () => socket.off('newNotification', handler);
+  }, [socket, navigate]);
+
+  const handleMarkAllRead = async () => {
+    await fetch("/api/notifications/read-all", { method: "PATCH", credentials: "include" });
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
+
+  const handleClearAll = async () => {
+    await fetch("/api/notifications", { method: "DELETE", credentials: "include" });
+    setNotifications([]);
+    setUnreadCount(0);
+    toast.success("All notifications cleared");
+  };
+
+  const handleMarkRead = async (id) => {
+    await fetch(`/api/notifications/${id}/read`, { method: "PATCH", credentials: "include" });
+    setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const handleFollowBack = async (senderId) => {
+    const isFollowing = followingMap[senderId];
+    const method = isFollowing ? "DELETE" : "POST";
+    const res = await fetch(`/api/follow/${senderId}`, { method, credentials: "include" });
+    if (res.ok) {
+      setFollowingMap(prev => ({ ...prev, [senderId]: !isFollowing }));
+    }
+  };
+
+  const handleNotifClick = (notif) => {
+    if (!notif.read) handleMarkRead(notif._id);
+    const sender = notif.sender;
+    if (notif.type === 'follow' && sender) {
+      navigate('/app/profile', { state: { user: sender } });
+    } else if (notif.refPost || notif.refStory) {
+      navigate('/app');
+    }
+  };
+
+  // Group by "Today" / "This Week" / "Earlier"
+  const now = new Date();
+  const today = notifications.filter(n => (now - new Date(n.createdAt)) < 86400000);
+  const thisWeek = notifications.filter(n => {
+    const diff = now - new Date(n.createdAt);
+    return diff >= 86400000 && diff < 604800000;
+  });
+  const earlier = notifications.filter(n => (now - new Date(n.createdAt)) >= 604800000);
+
+  const renderGroup = (label, items) => {
+    if (!items.length) return null;
+    return (
+      <div key={label}>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 flex items-center gap-3">
+          {label}
+          <div className="flex-1 h-px bg-white/5" />
+        </h2>
+        <div className="space-y-1">
+          {items.map(notif => {
+            const sender = notif.sender;
+            const isFollowType = notif.type === 'follow';
+            const isFollowing = followingMap[sender?._id];
+
+            return (
+              <div
+                key={notif._id}
+                onClick={() => handleNotifClick(notif)}
+                className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200 hover:bg-white/5 ${
+                  !notif.read ? 'bg-primary-pink/5 border border-primary-pink/10' : ''
+                }`}
+              >
+                {/* Unread dot */}
+                {!notif.read && (
+                  <div className="w-2 h-2 rounded-full bg-primary-pink shrink-0" />
+                )}
+
+                {/* Avatar */}
+                <div className="relative shrink-0">
+                  <img
+                    src={sender?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${sender?.username}`}
+                    alt={sender?.username}
+                    className="w-12 h-12 rounded-full object-cover border border-white/10 bg-surface"
+                  />
+                  {/* Type badge */}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-bg-darker rounded-full flex items-center justify-center border border-white/10">
+                    <NotifIcon type={notif.type} />
+                  </div>
                 </div>
 
-                {/* Right side action */}
-                {notif.type === 'follow' ? (
-                  <button 
-                    className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 ${
-                      notif.isFollowing 
-                        ? 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10' 
-                        : 'bg-primary-pink text-white shadow-xl shadow-primary-pink/20 hover:scale-105'
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white leading-snug">
+                    <span className="font-bold hover:text-primary-pink transition-colors">{sender?.username}</span>
+                    {' '}
+                    <span className="text-gray-400 font-medium">
+                      {notifText(notif.type, '').replace(sender?.username, '').trim()}
+                    </span>
+                  </p>
+                  <span className="text-[11px] text-gray-600 font-semibold">{timeAgo(notif.createdAt)}</span>
+                </div>
+
+                {/* Right side */}
+                {isFollowType ? (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleFollowBack(sender?._id); }}
+                    className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      isFollowing
+                        ? 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
+                        : 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-lg shadow-primary-pink/20'
                     }`}
                   >
-                    {notif.isFollowing ? 'Following' : 'Follow Back'}
+                    {isFollowing ? 'Following' : 'Follow Back'}
                   </button>
-                ) : (
-                  <div className="w-14 h-14 flex-shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-white/5 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                    <img 
-                      src={notif.postImage} 
-                      alt="Post thumbnail" 
-                      className="w-full h-full object-cover" 
-                    />
-                  </div>
-                )}
+                ) : (notif.imageUrl || notif.refPost?.imageUrl || notif.refStory?.mediaUrl) ? (
+                  <img
+                    src={notif.imageUrl || notif.refPost?.imageUrl || notif.refStory?.mediaUrl}
+                    alt=""
+                    className="w-12 h-12 rounded-xl object-cover shrink-0 border border-white/10"
+                  />
+                ) : null}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col h-full w-full max-w-2xl mx-auto px-4 py-8 md:px-8">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-black italic tracking-tighter text-white">
+            Notifi<span className="text-primary-pink">cations</span>
+          </h1>
+          {unreadCount > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              <span className="text-primary-pink font-bold">{unreadCount}</span> unread
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {unreadCount > 0 && (
+            <button
+              onClick={handleMarkAllRead}
+              className="text-xs font-bold uppercase tracking-widest text-primary-pink hover:text-white transition-colors"
+            >
+              Mark all read
+            </button>
+          )}
+          {notifications.length > 0 && (
+            <button
+              onClick={handleClearAll}
+              className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-red-400"
+              title="Clear all"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin text-primary-pink" size={36} />
+        </div>
+      ) : notifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Bell size={52} className="text-gray-700 mb-4" />
+          <h3 className="text-lg font-bold text-gray-500">No notifications yet</h3>
+          <p className="text-sm text-gray-600 mt-1">When someone follows you or interacts with your posts, you'll see it here.</p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {renderGroup("Today", today)}
+          {renderGroup("This Week", thisWeek)}
+          {renderGroup("Earlier", earlier)}
+        </div>
+      )}
     </div>
   );
 };

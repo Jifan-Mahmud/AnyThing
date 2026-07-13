@@ -1,8 +1,9 @@
 import Message from "./src/models/Message.js";
 import Conversation from "./src/models/Conversation.js";
+import Follow from "./src/models/Follow.js";
+import { createNotification } from "./src/controllers/notification.controller.js";
 
-const socketHandler = (io) => {
-  let onlineUsers = {};
+const socketHandler = (io, onlineUsers = {}) => {
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
@@ -30,10 +31,44 @@ const socketHandler = (io) => {
       });
     });
 
-    // --- New Post Broadcast ---
-    socket.on("newPostCreated", (post) => {
-      // Broadcast to all connected users (except sender)
+    // --- New Post/Reel Broadcast + Notifications ---
+    socket.on("newPostCreated", async (post) => {
+      // Broadcast to all connected users (for feed update)
       socket.broadcast.emit("feedUpdated", post);
+
+      // Send notifications to all followers
+      try {
+        const followers = await Follow.find({ following: userId }).select("follower");
+        for (const f of followers) {
+          await createNotification(io, onlineUsers, {
+            recipient: f.follower,
+            sender: userId,
+            type: post.type === "reel" ? "reel" : "post",
+            refPost: post._id,
+            imageUrl: post.imageUrl,
+          });
+        }
+      } catch (err) {
+        console.error("Error sending post notifications:", err);
+      }
+    });
+
+    // --- Story Created Notification ---
+    socket.on("newStoryCreated", async (story) => {
+      try {
+        const followers = await Follow.find({ following: userId }).select("follower");
+        for (const f of followers) {
+          await createNotification(io, onlineUsers, {
+            recipient: f.follower,
+            sender: userId,
+            type: "story",
+            refStory: story._id,
+            imageUrl: story.mediaUrl,
+          });
+        }
+      } catch (err) {
+        console.error("Error sending story notifications:", err);
+      }
     });
 
     // --- WebRTC Calling Events ---
@@ -44,7 +79,7 @@ const socketHandler = (io) => {
           offer,
           type,
           callerName,
-          callerAvatar
+          callerAvatar,
         });
       }
     });

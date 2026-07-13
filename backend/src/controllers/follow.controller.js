@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Follow from "../models/Follow.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { createNotification } from "./notification.controller.js";
 
 // ── Controllers ───────────────────────────────────────────────────────────────
 
@@ -23,6 +24,19 @@ export const followUser = async (req, res, next) => {
 
     // Create follow (will throw 11000 on duplicate — caught by errorHandler)
     await Follow.create({ follower: req.user._id, following: targetId });
+
+    // Send notification to the followed user
+    try {
+      const io = req.io;
+      const onlineUsers = req.onlineUsers || {};
+      await createNotification(io, onlineUsers, {
+        recipient: targetId,
+        sender: req.user._id,
+        type: "follow",
+      });
+    } catch (notifErr) {
+      console.error("Follow notification error:", notifErr);
+    }
 
     return sendSuccess(res, null, `You are now following @${target.username}`, 201);
   } catch (err) {

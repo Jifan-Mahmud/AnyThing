@@ -14,7 +14,12 @@ const io = new Server(httpServer, {
   },
 });
 
-socketHandler(io);
+// Share io with Express app so req.io is available in controllers
+const onlineUsers = {};
+app.set("io", io);
+app.set("onlineUsers", onlineUsers);
+
+socketHandler(io, onlineUsers);
 
 // Connect to MongoDB, then start the HTTP server
 connectDB().then(() => {

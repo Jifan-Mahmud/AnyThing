@@ -14,6 +14,7 @@ import commentRoutes from "./src/routes/comment.routes.js";
 import storyRoutes from "./src/routes/story.routes.js";
 import messageRoutes from "./src/routes/message.routes.js";
 import conversationRoutes from "./src/routes/conversation.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
 import { getUserPosts } from "./src/controllers/post.controller.js";
 
 // ── Middleware imports ────────────────────────────────────────────────────────
@@ -46,6 +47,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, message: "Anithing API is running 🚀" });
+});
+
+// ── Inject io into req so controllers can emit notifications ──────────────────
+app.use((req, _res, next) => {
+  req.io = app.get("io");
+  req.onlineUsers = app.get("onlineUsers") || {};
+  next();
 });
 
 // ── Routes ────────────────────────────────────────────────────────────────────
@@ -91,6 +99,9 @@ app.use("/api/messages", messageRoutes);
 
 // Conversations: /api/conversations/*
 app.use("/api/conversations", conversationRoutes);
+
+// Notifications: /api/notifications/*
+app.use("/api/notifications", notificationRoutes);
 
 // User posts: GET /api/users/:userId/posts
 app.get("/api/users/:userId/posts", getUserPosts);
