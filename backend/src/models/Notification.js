@@ -18,7 +18,7 @@ const notificationSchema = new mongoose.Schema(
     // What type of notification
     type: {
       type: String,
-      enum: ["follow", "like", "comment", "post", "reel", "story"],
+      enum: ["follow", "like", "comment", "post", "reel", "story", "audio_call", "video_call"],
       required: true,
     },
     // Optional reference to the post/story/reel

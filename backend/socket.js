@@ -1,6 +1,7 @@
 import Message from "./src/models/Message.js";
 import Conversation from "./src/models/Conversation.js";
 import Follow from "./src/models/Follow.js";
+import User from "./src/models/User.js";
 import { createNotification } from "./src/controllers/notification.controller.js";
 
 const socketHandler = (io, onlineUsers = {}) => {
@@ -72,7 +73,7 @@ const socketHandler = (io, onlineUsers = {}) => {
     });
 
     // --- WebRTC Calling Events ---
-    socket.on("call-user", ({ to, offer, type, callerName, callerAvatar }) => {
+    socket.on("call-user", async ({ to, offer, type, callerName, callerAvatar }) => {
       if (onlineUsers[to]) {
         io.to(onlineUsers[to]).emit("incoming-call", {
           from: userId,
@@ -81,6 +82,17 @@ const socketHandler = (io, onlineUsers = {}) => {
           callerName,
           callerAvatar,
         });
+      }
+
+      // Save call notification regardless of whether recipient is online
+      try {
+        await createNotification(io, onlineUsers, {
+          recipient: to,
+          sender: userId,
+          type: type === "video" ? "video_call" : "audio_call",
+        });
+      } catch (err) {
+        console.error("Error saving call notification:", err);
       }
     });
 

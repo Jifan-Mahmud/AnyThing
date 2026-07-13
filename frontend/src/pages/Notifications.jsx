@@ -20,26 +20,30 @@ const timeAgo = (date) => {
 const NotifIcon = ({ type }) => {
   const base = "w-5 h-5";
   switch (type) {
-    case 'like':    return <Heart className={`${base} text-red-400`} fill="currentColor" />;
-    case 'follow':  return <UserPlus className={`${base} text-blue-400`} />;
-    case 'comment': return <ImageIcon className={`${base} text-yellow-400`} />;
-    case 'post':    return <ImageIcon className={`${base} text-primary-pink`} />;
-    case 'reel':    return <Film className={`${base} text-purple-400`} />;
-    case 'story':   return <BookImage className={`${base} text-green-400`} />;
-    default:        return <Bell className={`${base} text-gray-400`} />;
+    case 'like':        return <Heart className={`${base} text-red-400`} fill="currentColor" />;
+    case 'follow':      return <UserPlus className={`${base} text-blue-400`} />;
+    case 'comment':     return <ImageIcon className={`${base} text-yellow-400`} />;
+    case 'post':        return <ImageIcon className={`${base} text-primary-pink`} />;
+    case 'reel':        return <Film className={`${base} text-purple-400`} />;
+    case 'story':       return <BookImage className={`${base} text-green-400`} />;
+    case 'audio_call':  return <Phone className={`${base} text-emerald-400`} />;
+    case 'video_call':  return <Video className={`${base} text-sky-400`} />;
+    default:            return <Bell className={`${base} text-gray-400`} />;
   }
 };
 
 // Text per type
 const notifText = (type, senderName) => {
   switch (type) {
-    case 'follow':  return `${senderName} started following you.`;
-    case 'like':    return `${senderName} liked your post.`;
-    case 'comment': return `${senderName} commented on your post.`;
-    case 'post':    return `${senderName} shared a new post.`;
-    case 'reel':    return `${senderName} shared a new reel.`;
-    case 'story':   return `${senderName} added a new story.`;
-    default:        return `${senderName} did something.`;
+    case 'follow':      return `${senderName} started following you.`;
+    case 'like':        return `${senderName} liked your post.`;
+    case 'comment':     return `${senderName} commented on your post.`;
+    case 'post':        return `${senderName} shared a new post.`;
+    case 'reel':        return `${senderName} shared a new reel.`;
+    case 'story':       return `${senderName} added a new story.`;
+    case 'audio_call':  return `${senderName} called you (Audio).`;
+    case 'video_call':  return `${senderName} called you (Video).`;
+    default:            return `${senderName} did something.`;
   }
 };
 
