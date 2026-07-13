@@ -298,7 +298,7 @@ const Feed = () => {
           {suggestions && suggestions.length > 0 ? (
             suggestions.map((u) => (
               <div key={u._id} className="flex items-center justify-between">
-                <div onClick={() => navigate(`/app/profile?username=${u.username}`)} className="flex items-center gap-3 cursor-pointer">
+                <div onClick={() => navigate(`/app/profile`, { state: { user: u } })} className="flex items-center gap-3 cursor-pointer">
                   <img 
                     src={u.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.username}`} 
                     alt={u.username} 
