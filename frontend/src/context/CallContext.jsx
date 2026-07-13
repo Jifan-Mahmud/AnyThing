@@ -93,9 +93,9 @@ export const CallProvider = ({ children }) => {
       
       // Handle candidates
       pcRef.current.onicecandidate = (event) => {
-        if (event.candidate && otherUserRef.current) {
+        if (event.candidate) {
           socket.emit("ice-candidate", {
-            to: otherUserRef.current._id,
+            to: from,
             candidate: event.candidate,
           });
         }
