@@ -35,19 +35,19 @@ const Login = () => {
       </div>
 
       {/* Navbar */}
-      <nav className="flex justify-between items-center p-6 lg:px-12 relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
+      <nav className="flex justify-between items-center p-4 sm:p-6 lg:px-12 relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="flex items-center gap-2">
           {/* Logo */}
-          <div className="text-2xl font-black tracking-tighter italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+          <div className="text-xl sm:text-2xl font-black tracking-tighter italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             Any<span className="text-primary-pink">Thing</span>
           </div>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-full px-2 py-2 flex items-center gap-2 border border-white/10 shadow-xl">
-          <button onClick={() => navigate('/login')} className="px-6 py-2 font-medium hover:text-primary-pink transition-colors">
+        <div className="bg-white/10 backdrop-blur-md rounded-full p-1 sm:p-1.5 flex items-center gap-1 sm:gap-2 border border-white/10 shadow-xl shrink-0">
+          <button onClick={() => navigate('/login')} className="px-3 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm font-semibold hover:text-primary-pink transition-colors">
             LogIn
           </button>
-          <button onClick={() => navigate('/signup')} className="px-6 py-2 bg-primary-pink text-white rounded-full font-medium hover:bg-white hover:text-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-pink/20">
+          <button onClick={() => navigate('/signup')} className="px-3 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm bg-primary-pink text-white rounded-full font-semibold hover:bg-white hover:text-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-pink/20">
             SignIn
           </button>
         </div>
@@ -102,14 +102,34 @@ const Login = () => {
             </span>
             <Star className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/30" size={32} />
           </div>
+        {/* Mobile-Only Responsive Content Section */}
+        <div className="w-full max-w-md mx-auto mt-16 px-4 pb-12 flex flex-col gap-6 lg:hidden relative z-20">
+          <div className="bg-surface/50 backdrop-blur-md rounded-3xl p-6 border border-white/5 text-center">
+            <h2 className="text-xl font-bold leading-snug mb-2">
+              From Likes to Leads, We Drive Results
+            </h2>
+            <p className="text-xs text-gray-400">
+              Thriving Brands, Thrilled Clients - Our AnyThing Management in Action
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 bg-surface/50 backdrop-blur-md rounded-3xl p-6 border border-white/5 text-center">
+            <div className="group cursor-default">
+              <h3 className="text-3xl font-extrabold text-primary-pink mb-0.5">500+</h3>
+              <p className="text-[9px] text-gray-500 uppercase tracking-widest">Accounts Managed</p>
+            </div>
+            <div className="group cursor-default">
+              <h3 className="text-3xl font-extrabold text-primary-pink mb-0.5">800+</h3>
+              <p className="text-[9px] text-gray-500 uppercase tracking-widest">Happy Customers</p>
+            </div>
+          </div>
         </div>
-
       </main>
 
       {/* Decorative Panels */}
       
-      {/* Bottom Left Panel */}
-      <div className="absolute bottom-0 left-0 w-full md:w-1/3 bg-surface/80 backdrop-blur-xl text-white pt-16 pb-12 px-8 lg:px-16 rounded-tr-[80px] lg:rounded-tr-[120px] z-20 border-t border-r border-white/10 shadow-2xl">
+      {/* Bottom Left Panel (Desktop only) */}
+      <div className="absolute bottom-0 left-0 w-full md:w-1/3 bg-surface/80 backdrop-blur-xl text-white pt-16 pb-12 px-8 lg:px-16 rounded-tr-[80px] lg:rounded-tr-[120px] z-20 border-t border-r border-white/10 shadow-2xl hidden lg:block">
         <div className="absolute -top-12 left-8 flex items-end gap-1 text-primary-pink">
            <svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-pulse">
              <path d="M0 20 Q 15 0, 30 20 T 60 20 T 90 20 T 120 20" stroke="currentColor" strokeWidth="3" fill="none" />
@@ -133,8 +153,8 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Bottom Right Panel */}
-      <div className="absolute bottom-0 right-0 w-full md:w-[40%] bg-surface/80 backdrop-blur-xl text-white pt-24 pb-12 px-8 lg:px-16 rounded-tl-[100px] lg:rounded-tl-[150px] z-10 flex flex-col items-center text-center border-t border-l border-white/10 shadow-2xl">
+      {/* Bottom Right Panel (Desktop only) */}
+      <div className="absolute bottom-0 right-0 w-full md:w-[40%] bg-surface/80 backdrop-blur-xl text-white pt-24 pb-12 px-8 lg:px-16 rounded-tl-[100px] lg:rounded-tl-[150px] z-10 flex flex-col items-center text-center border-t border-l border-white/10 shadow-2xl hidden lg:flex">
         <p className="text-sm lg:text-base font-medium text-gray-400 mb-8 max-w-xs">
           Thriving Brands, Thrilled Clients - Our AnyThing Management in Action
         </p>
