@@ -10,7 +10,13 @@ export const useCall = () => useContext(CallContext);
 const servers = {
   iceServers: [
     {
-      urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302",
+        "stun:stun3.l.google.com:19302",
+        "stun:stun4.l.google.com:19302",
+      ],
     },
   ],
 };
@@ -28,14 +34,29 @@ export const CallProvider = ({ children }) => {
   const pcRef = useRef(null);
   const localStreamRef = useRef(null);
   const otherUserRef = useRef(null);
+  const queuedCandidatesRef = useRef([]);
 
   // Keep otherUser ref in sync for WebRTC handlers
   useEffect(() => {
     otherUserRef.current = otherUser;
   }, [otherUser]);
 
+  const processQueuedCandidates = async () => {
+    if (pcRef.current && pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
+      while (queuedCandidatesRef.current.length > 0) {
+        const candidate = queuedCandidatesRef.current.shift();
+        try {
+          await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error("Error adding queued ice candidate", e);
+        }
+      }
+    }
+  };
+
   // Clean up streams on unmount or when call ends
   const cleanupStreams = () => {
+    queuedCandidatesRef.current = [];
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => track.stop());
       localStreamRef.current = null;
@@ -82,6 +103,7 @@ export const CallProvider = ({ children }) => {
 
       try {
         await pcRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+        await processQueuedCandidates();
       } catch (err) {
         console.warn("Failed to set remote description on incoming offer:", err);
       }
@@ -92,6 +114,7 @@ export const CallProvider = ({ children }) => {
       if (pcRef.current) {
         try {
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+          await processQueuedCandidates();
         } catch (err) {
           console.warn("Failed to set remote description on answered call:", err);
         }
@@ -101,12 +124,14 @@ export const CallProvider = ({ children }) => {
 
     // Listen for ICE candidates
     socket.on("ice-candidate", async ({ candidate }) => {
-      if (pcRef.current) {
+      if (pcRef.current && pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
         try {
           await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
         } catch (e) {
           console.error("Error adding ice candidate", e);
         }
+      } else {
+        queuedCandidatesRef.current.push(candidate);
       }
     });
 
