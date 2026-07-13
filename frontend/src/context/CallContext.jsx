@@ -162,7 +162,11 @@ export const CallProvider = ({ children }) => {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
           video: type === "video",
-          audio: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
         });
         localStreamRef.current = stream;
         setLocalStream(stream);
@@ -230,7 +234,11 @@ export const CallProvider = ({ children }) => {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
           video: callType === "video",
-          audio: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
         });
         localStreamRef.current = stream;
         setLocalStream(stream);
