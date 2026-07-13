@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Film, X, Loader2 } from 'lucide-react';
+import { Search, Film, X, Loader2, ArrowLeft } from 'lucide-react';
 import PostCard from '../components/feed/PostCard';
 
 const MOCK_EXPLORE_POSTS = [
@@ -178,10 +178,24 @@ const Explore = () => {
       {/* Post Modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4 bg-black/95 md:bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          
+          {/* Mobile Top Header Bar */}
+          <div className="fixed top-0 inset-x-0 h-14 bg-bg-darker/90 backdrop-blur-md border-b border-white/5 flex items-center px-4 justify-between z-50 md:hidden">
+            <button 
+              onClick={() => setSelectedPost(null)} 
+              className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold active:scale-95 transition-transform"
+            >
+              <ArrowLeft size={20} /> Back
+            </button>
+            <span className="text-sm font-bold text-white tracking-wide">Post</span>
+            <div className="w-10" /> {/* balance spacer */}
+          </div>
+
           <div className="relative w-full h-full md:h-auto md:max-w-lg overflow-y-auto hide-scrollbar md:rounded-3xl animate-in zoom-in-95 duration-200">
+            {/* Desktop-only Close Button */}
             <button 
               onClick={() => setSelectedPost(null)}
-              className="fixed md:absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors backdrop-blur-md"
+              className="hidden md:block absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors backdrop-blur-md"
             >
               <X size={24} />
             </button>
