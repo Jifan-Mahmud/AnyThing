@@ -291,7 +291,7 @@ const Feed = () => {
       <div className="hidden lg:block w-80 py-8 px-6 border-l border-white/5">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-gray-400 font-semibold text-sm">SUGGESTED FOR YOU</h3>
-          <button className="text-white text-xs font-semibold hover:text-gray-300">See All</button>
+          <button onClick={() => navigate('/app/explore/people')} className="text-white text-xs font-semibold hover:text-gray-300">See All</button>
         </div>
 
         <div className="space-y-4">

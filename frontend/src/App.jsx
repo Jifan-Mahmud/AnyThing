@@ -13,6 +13,7 @@ import Explore from './pages/Explore';
 import Notifications from './pages/Notifications';
 import LoginForm from './pages/LoginForm';
 import SignupForm from './pages/SignupForm';
+import SuggestedPeople from './pages/SuggestedPeople';
 import { useAuth } from './context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -57,6 +58,7 @@ function App() {
           <Route index element={<Feed />} />
           <Route path="reels" element={<Reels />} />
           <Route path="explore" element={<Explore />} />
+          <Route path="explore/people" element={<SuggestedPeople />} />
           <Route path="messages" element={<Messages />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<Profile />} />
