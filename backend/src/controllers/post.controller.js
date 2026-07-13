@@ -84,32 +84,39 @@ export const createPost = async (req, res, next) => {
 export const getFeed = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(20, parseInt(req.query.limit) || 10);
+    const limit = Math.min(50, parseInt(req.query.limit) || 15);
     const skip = (page - 1) * limit;
 
     // Get IDs of users the current user follows
     const following = await Follow.find({ follower: req.user._id }).select("following");
-    const followingIds = following.map((f) => f.following);
+    const followingIds = following.map((f) => f.following.toString());
 
-    // If the user doesn't follow anyone, show posts from ALL users (public feed).
-    // Otherwise, show their own posts + posts from users they follow.
-    const filter = followingIds.length > 0
-      ? { author: { $in: [req.user._id, ...followingIds] } }
-      : {};
+    // Fetch latest posts from the entire platform
+    const posts = await Post.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "username name avatarUrl");
 
-    const [posts, total] = await Promise.all([
-      Post.find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("author", "username name avatarUrl"),
-      Post.countDocuments(filter),
-    ]);
-
+    const total = await Post.countDocuments({});
     const enriched = await enrichPosts(posts, req.user._id);
 
+    // Smart Sorting:
+    // 1. Followed users and own posts go to the top
+    // 2. All other public posts go below
+    // 3. Within each group, sort by createdAt descending (newest first)
+    const sorted = enriched.sort((a, b) => {
+      const aIsFollowed = followingIds.includes(a.author?._id?.toString()) || a.author?._id?.toString() === req.user._id.toString();
+      const bIsFollowed = followingIds.includes(b.author?._id?.toString()) || b.author?._id?.toString() === req.user._id.toString();
+
+      if (aIsFollowed && !bIsFollowed) return -1;
+      if (!aIsFollowed && bIsFollowed) return 1;
+
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
     return sendSuccess(res, {
-      posts: enriched,
+      posts: sorted,
       total,
       page,
       limit,
