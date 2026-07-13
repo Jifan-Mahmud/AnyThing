@@ -135,3 +135,26 @@ export const searchUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * GET /api/users/suggested
+ * Get suggested users for the logged-in user (users they don't follow yet).
+ */
+export const getSuggestedUsers = async (req, res, next) => {
+  try {
+    const following = await Follow.find({ follower: req.user._id }).select("following");
+    const followingIds = following.map((f) => f.following);
+
+    const limit = Math.min(20, parseInt(req.query.limit) || 5);
+    
+    const users = await User.find({
+      _id: { $nin: [...followingIds, req.user._id] }
+    })
+      .select("username name avatarUrl bio")
+      .limit(limit);
+
+    return sendSuccess(res, users);
+  } catch (err) {
+    next(err);
+  }
+};

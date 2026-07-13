@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
+import { toast } from 'react-toastify';
 
 // Import local assets for mock story/reel fallbacks
 import reel1 from '../assets/WhatsApp Video 2026-05-05 at 12.19.17 AM.mp4';
@@ -38,6 +39,37 @@ const Feed = () => {
   const [myStory, setMyStory] = useState(null);
   const [hasMyStory, setHasMyStory] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [suggestions, setSuggestions] = useState([]);
+
+  const fetchSuggestions = async () => {
+    try {
+      const res = await fetch("/api/users/suggested", { credentials: "include" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSuggestions(data.data || []);
+      }
+    } catch (err) {
+      console.error("Error loading suggestions:", err);
+    }
+  };
+
+  const handleFollowUser = async (userId) => {
+    try {
+      const res = await fetch(`/api/follow/${userId}`, {
+        method: "POST",
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(data.message || "Followed successfully");
+        setSuggestions(prev => prev.filter(u => u._id !== userId));
+        fetchFeedAndReels();
+      }
+    } catch (err) {
+      console.error("Error following user:", err);
+      toast.error("Failed to follow user");
+    }
+  };
 
   const fetchFeedAndReels = async () => {
     setLoading(true);
@@ -114,6 +146,7 @@ const Feed = () => {
   useEffect(() => {
     if (user) {
       fetchFeedAndReels();
+      fetchSuggestions();
     } else {
       setLoading(false);
     }
@@ -262,20 +295,35 @@ const Feed = () => {
         </div>
 
         <div className="space-y-4">
-          {SUGGESTIONS.map((u) => (
-            <div key={u.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-3 cursor-pointer">
-                <img src={u.avatar} alt={u.username} className="w-10 h-10 rounded-full" />
-                <div>
-                  <h4 className="text-sm font-semibold text-white">{u.username}</h4>
-                  <p className="text-xs text-gray-500">{u.subtitle}</p>
+          {suggestions && suggestions.length > 0 ? (
+            suggestions.map((u) => (
+              <div key={u._id} className="flex items-center justify-between">
+                <div onClick={() => navigate(`/app/profile?username=${u.username}`)} className="flex items-center gap-3 cursor-pointer">
+                  <img 
+                    src={u.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.username}`} 
+                    alt={u.username} 
+                    className="w-10 h-10 rounded-full object-cover bg-surface border border-white/5" 
+                  />
+                  <div>
+                    <h4 className="text-sm font-semibold text-white hover:text-primary-pink transition-colors">
+                      {u.username}
+                    </h4>
+                    <p className="text-xs text-gray-500 truncate max-w-[130px]">
+                      {u.name || "Suggested for you"}
+                    </p>
+                  </div>
                 </div>
+                <button 
+                  onClick={() => handleFollowUser(u._id)}
+                  className="text-primary-pink text-xs font-semibold hover:text-primary-pink-hover transition-colors"
+                >
+                  Follow
+                </button>
               </div>
-              <button className="text-primary-pink text-xs font-semibold hover:text-primary-pink-hover">
-                Follow
-              </button>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-xs text-gray-500 text-center py-2">No new suggestions</p>
+          )}
         </div>
 
         {/* Footer */}

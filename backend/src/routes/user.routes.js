@@ -6,6 +6,7 @@ import {
   getUserByUsername,
   updateMe,
   searchUsers,
+  getSuggestedUsers,
   updateMeSchema,
 } from "../controllers/user.controller.js";
 import { getFollowers, getFollowing } from "../controllers/follow.controller.js";
@@ -18,9 +19,9 @@ const router = Router();
 router.get("/me", requireAuth, getMe);
 router.patch("/me", requireAuth, upload.single("avatar"), validate(updateMeSchema), updateMe);
 
-// ── Search (public) ───────────────────────────────────────────────────────────
-// MUST be before /:username to avoid shadowing
+// ── Search & Suggestions (protected/public) ────────────────────────────────────
 router.get("/search", searchUsers);
+router.get("/suggested", requireAuth, getSuggestedUsers);
 
 // ── User posts — handled in post.routes.js at /api/users/:userId/posts ────────
 
