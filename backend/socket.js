@@ -73,7 +73,8 @@ const socketHandler = (io, onlineUsers = {}) => {
     });
 
     // --- WebRTC Calling Events ---
-    socket.on("call-user", async ({ to, offer, type, callerName, callerAvatar }) => {
+    socket.on("call-user", ({ to, offer, type, callerName, callerAvatar }) => {
+      // Always emit incoming-call FIRST — this must never be blocked
       if (onlineUsers[to]) {
         io.to(onlineUsers[to]).emit("incoming-call", {
           from: userId,
@@ -84,16 +85,12 @@ const socketHandler = (io, onlineUsers = {}) => {
         });
       }
 
-      // Save call notification regardless of whether recipient is online
-      try {
-        await createNotification(io, onlineUsers, {
-          recipient: to,
-          sender: userId,
-          type: type === "video" ? "video_call" : "audio_call",
-        });
-      } catch (err) {
-        console.error("Error saving call notification:", err);
-      }
+      // Save call notification asynchronously (fire-and-forget — never blocks signaling)
+      createNotification(io, onlineUsers, {
+        recipient: to,
+        sender: userId,
+        type: type === "video" ? "video_call" : "audio_call",
+      }).catch((err) => console.error("Call notification error:", err));
     });
 
     socket.on("answer-call", ({ to, answer }) => {
