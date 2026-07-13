@@ -41,6 +41,12 @@ export const CallProvider = ({ children }) => {
     otherUserRef.current = otherUser;
   }, [otherUser]);
 
+  // Keep callState ref in sync to avoid stale closures in socket listeners
+  const callStateRef = useRef(callState);
+  useEffect(() => {
+    callStateRef.current = callState;
+  }, [callState]);
+
   const processQueuedCandidates = async () => {
     if (pcRef.current && pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
       while (queuedCandidatesRef.current.length > 0) {
@@ -74,7 +80,7 @@ export const CallProvider = ({ children }) => {
 
     // Listen for incoming call
     socket.on("incoming-call", async ({ from, offer, type, callerName, callerAvatar }) => {
-      if (callState !== "idle") {
+      if (callStateRef.current !== "idle") {
         // Busy
         return;
       }
@@ -148,7 +154,7 @@ export const CallProvider = ({ children }) => {
       socket.off("ice-candidate");
       socket.off("call-ended");
     };
-  }, [socket, callState]);
+  }, [socket]);
 
   // Start outgoing call
   const startCall = async (targetUserId, type, targetUserName, targetUserAvatar) => {
