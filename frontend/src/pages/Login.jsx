@@ -102,6 +102,7 @@ const Login = () => {
             </span>
             <Star className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/30" size={32} />
           </div>
+        </div>
         {/* Mobile-Only Responsive Content Section */}
         <div className="w-full max-w-md mx-auto mt-16 px-4 pb-12 flex flex-col gap-6 lg:hidden relative z-20">
           <div className="bg-surface/50 backdrop-blur-md rounded-3xl p-6 border border-white/5 text-center">
