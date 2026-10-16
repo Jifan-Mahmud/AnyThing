@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import Follow from "../models/Follow.js";
 import Post from "../models/Post.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { signToken } from "../utils/jwt.js";
 
 // ── Zod schemas ───────────────────────────────────────────────────────────────
 export const updateMeSchema = z.object({
@@ -22,7 +23,7 @@ export const updateMeSchema = z.object({
 
 /**
  * GET /api/me
- * Returns the currently logged-in user's profile with follower/following counts.
+ * Returns the currently logged-in user's profile with follower/following counts and JWT token.
  */
 export const getMe = async (req, res, next) => {
   try {
@@ -32,16 +33,24 @@ export const getMe = async (req, res, next) => {
       Post.countDocuments({ author: req.user._id }),
     ]);
 
+    const token = await signToken({
+      userId: req.user._id.toString(),
+      email: req.user.email,
+      username: req.user.username,
+    });
+
     return sendSuccess(res, {
       ...req.user.toObject(),
       followerCount,
       followingCount,
       postCount,
+      token,
     });
   } catch (err) {
     next(err);
   }
 };
+
 
 /**
  * GET /api/users/:username

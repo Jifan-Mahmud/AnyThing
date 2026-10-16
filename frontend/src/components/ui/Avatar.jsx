@@ -10,14 +10,14 @@ const Avatar = ({ src, alt, size = 'md', hasStory = false, isOnline = false, cla
 
   return (
     <div className={`relative inline-block ${className}`}>
-      <div 
-        className={`rounded-full overflow-hidden ${sizeClasses[size]} ${
+      <div
+        className={`rounded-full overflow-hidden ${sizeClasses[size] || sizeClasses.md} ${
           hasStory ? 'ring-2 ring-primary-pink ring-offset-2 ring-offset-bg-darker p-[2px]' : ''
         }`}
       >
-        <img 
-          src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'} 
-          alt={alt || 'Avatar'} 
+        <img
+          src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'}
+          alt={alt || 'Avatar'}
           className="w-full h-full object-cover rounded-full"
         />
       </div>

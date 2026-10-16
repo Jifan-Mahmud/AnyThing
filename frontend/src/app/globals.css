@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary-pink: #ff69b4;
+  --color-primary-pink-hover: #ff1493;
+  --color-bg-dark: #121212;
+  --color-bg-darker: #0a0a0a;
+  --color-surface: #1e1e1e;
+  --color-surface-light: #2c2c2c;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+}
+
+body {
+  background-color: var(--color-bg-darker, #0a0a0a);
+  color: var(--foreground, #ffffff);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.glass-panel {
+  background: rgba(30, 30, 30, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-bubble {
+  background: rgba(255, 105, 180, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 105, 180, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 12px rgba(255, 105, 180, 0.6);
+}
+
+@keyframes flyUp {
+  0% {
+    transform: translateY(100vh) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-20vh) scale(1.5) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+.animate-fly-up {
+  animation: flyUp 15s linear infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2c2c2c;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444450;
+}

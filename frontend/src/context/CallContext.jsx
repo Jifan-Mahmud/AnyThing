@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
-import { useSocket } from "./SocketContext";
-import { useAuth } from "./AuthContext";
-import { toast } from "react-toastify";
+'use client';
+
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { useSocket } from './SocketContext';
+import { useAuth } from './AuthContext';
+import { toast } from 'react-toastify';
 
 const CallContext = createContext();
 
@@ -11,11 +13,11 @@ const servers = {
   iceServers: [
     {
       urls: [
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-        "stun:stun2.l.google.com:19302",
-        "stun:stun3.l.google.com:19302",
-        "stun:stun4.l.google.com:19302",
+        'stun:stun.l.google.com:19302',
+        'stun:stun1.l.google.com:19302',
+        'stun:stun2.l.google.com:19302',
+        'stun:stun3.l.google.com:19302',
+        'stun:stun4.l.google.com:19302',
       ],
     },
   ],
@@ -25,7 +27,7 @@ export const CallProvider = ({ children }) => {
   const { socket } = useSocket();
   const { user: currentUser } = useAuth();
 
-  const [callState, setCallState] = useState("idle"); // 'idle' | 'incoming' | 'outgoing' | 'connected'
+  const [callState, setCallState] = useState('idle'); // 'idle' | 'incoming' | 'outgoing' | 'connected'
   const [callType, setCallType] = useState(null); // 'audio' | 'video'
   const [otherUser, setOtherUser] = useState(null); // { id, username, avatarUrl }
   const [localStream, setLocalStream] = useState(null);
@@ -52,9 +54,11 @@ export const CallProvider = ({ children }) => {
       while (queuedCandidatesRef.current.length > 0) {
         const candidate = queuedCandidatesRef.current.shift();
         try {
-          await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+          if (typeof window !== 'undefined' && window.RTCIceCandidate) {
+            await pcRef.current.addIceCandidate(new window.RTCIceCandidate(candidate));
+          }
         } catch (e) {
-          console.error("Error adding queued ice candidate", e);
+          console.error('Error adding queued ice candidate', e);
         }
       }
     }
@@ -76,65 +80,69 @@ export const CallProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || typeof window === 'undefined') return;
 
     // Listen for incoming call
-    socket.on("incoming-call", async ({ from, offer, type, callerName, callerAvatar }) => {
-      if (callStateRef.current !== "idle") {
-        // Busy
+    socket.on('incoming-call', async ({ from, offer, type, callerName, callerAvatar }) => {
+      if (callStateRef.current !== 'idle') {
         return;
       }
       setCallType(type);
       setOtherUser({ _id: from, username: callerName, avatarUrl: callerAvatar });
-      setCallState("incoming");
+      setCallState('incoming');
 
-      // Initialize peer connection in background, store offer
-      pcRef.current = new RTCPeerConnection(servers);
-      
-      // Handle candidates
-      pcRef.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket.emit("ice-candidate", {
-            to: from,
-            candidate: event.candidate,
-          });
+      if (window.RTCPeerConnection) {
+        pcRef.current = new window.RTCPeerConnection(servers);
+
+        pcRef.current.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit('ice-candidate', {
+              to: from,
+              candidate: event.candidate,
+            });
+          }
+        };
+
+        pcRef.current.ontrack = (event) => {
+          if (event.streams && event.streams[0]) {
+            setRemoteStream(event.streams[0]);
+          }
+        };
+
+        try {
+          await pcRef.current.setRemoteDescription(new window.RTCSessionDescription(offer));
+          await processQueuedCandidates();
+        } catch (err) {
+          console.warn('Failed to set remote description on incoming offer:', err);
         }
-      };
-
-      pcRef.current.ontrack = (event) => {
-        if (event.streams && event.streams[0]) {
-          setRemoteStream(event.streams[0]);
-        }
-      };
-
-      try {
-        await pcRef.current.setRemoteDescription(new RTCSessionDescription(offer));
-        await processQueuedCandidates();
-      } catch (err) {
-        console.warn("Failed to set remote description on incoming offer:", err);
       }
     });
 
     // Listen for call answered (outgoing flow)
-    socket.on("call-answered", async ({ answer }) => {
-      if (pcRef.current) {
+    socket.on('call-answered', async ({ answer }) => {
+      if (pcRef.current && typeof window !== 'undefined') {
         try {
-          await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+          await pcRef.current.setRemoteDescription(new window.RTCSessionDescription(answer));
           await processQueuedCandidates();
         } catch (err) {
-          console.warn("Failed to set remote description on answered call:", err);
+          console.warn('Failed to set remote description on answered call:', err);
         }
-        setCallState("connected");
+        setCallState('connected');
       }
     });
 
     // Listen for ICE candidates
-    socket.on("ice-candidate", async ({ candidate }) => {
-      if (pcRef.current && pcRef.current.remoteDescription && pcRef.current.remoteDescription.type) {
+    socket.on('ice-candidate', async ({ candidate }) => {
+      if (
+        pcRef.current &&
+        pcRef.current.remoteDescription &&
+        pcRef.current.remoteDescription.type &&
+        typeof window !== 'undefined'
+      ) {
         try {
-          await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+          await pcRef.current.addIceCandidate(new window.RTCIceCandidate(candidate));
         } catch (e) {
-          console.error("Error adding ice candidate", e);
+          console.error('Error adding ice candidate', e);
         }
       } else {
         queuedCandidatesRef.current.push(candidate);
@@ -142,32 +150,32 @@ export const CallProvider = ({ children }) => {
     });
 
     // Listen for call ended
-    socket.on("call-ended", () => {
-      toast.info("Call ended");
-      setCallState("idle");
+    socket.on('call-ended', () => {
+      toast.info('Call ended');
+      setCallState('idle');
       cleanupStreams();
     });
 
     return () => {
-      socket.off("incoming-call");
-      socket.off("call-answered");
-      socket.off("ice-candidate");
-      socket.off("call-ended");
+      socket.off('incoming-call');
+      socket.off('call-answered');
+      socket.off('ice-candidate');
+      socket.off('call-ended');
     };
   }, [socket]);
 
   // Start outgoing call
   const startCall = async (targetUserId, type, targetUserName, targetUserAvatar) => {
-    if (!socket) return;
+    if (!socket || typeof window === 'undefined') return;
     setCallType(type);
     setOtherUser({ _id: targetUserId, username: targetUserName, avatarUrl: targetUserAvatar });
-    setCallState("outgoing");
+    setCallState('outgoing');
 
     let stream = null;
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: type === "video",
+          video: type === 'video',
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
@@ -176,70 +184,62 @@ export const CallProvider = ({ children }) => {
         });
         localStreamRef.current = stream;
         setLocalStream(stream);
-      } else {
-        console.warn("navigator.mediaDevices is not supported in this environment");
       }
     } catch (err) {
-      console.warn("Failed to start call media stream:", err);
-      toast.info("Using avatar fallback (Camera/Mic blocked or unavailable)");
+      console.warn('Failed to start call media stream:', err);
+      toast.info('Using avatar fallback (Camera/Mic blocked or unavailable)');
     }
 
     try {
-      // Create PeerConnection
-      const pc = new RTCPeerConnection(servers);
+      const pc = new window.RTCPeerConnection(servers);
       pcRef.current = pc;
 
       if (stream) {
-        // Add local tracks to peer connection
         stream.getTracks().forEach((track) => pc.addTrack(track, stream));
       }
 
-      // Handle ICE candidates
       pc.onicecandidate = (event) => {
         if (event.candidate) {
-          socket.emit("ice-candidate", {
+          socket.emit('ice-candidate', {
             to: targetUserId,
             candidate: event.candidate,
           });
         }
       };
 
-      // Handle remote track
       pc.ontrack = (event) => {
         if (event.streams && event.streams[0]) {
           setRemoteStream(event.streams[0]);
         }
       };
 
-      // Create Offer
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      // Emit call signal
-      socket.emit("call-user", {
+      socket.emit('call-user', {
         to: targetUserId,
         offer,
         type,
-        callerName: currentUser.username,
-        callerAvatar: currentUser.avatarUrl,
+        callerName: currentUser?.username,
+        callerAvatar: currentUser?.avatarUrl,
       });
     } catch (err) {
-      console.error("WebRTC offer setup failed:", err);
-      toast.error("Failed to establish WebRTC signal.");
-      setCallState("idle");
+      console.error('WebRTC offer setup failed:', err);
+      toast.error('Failed to establish WebRTC signal.');
+      setCallState('idle');
       cleanupStreams();
     }
   };
 
   // Accept incoming call
   const acceptCall = async () => {
-    if (!socket || !otherUser) return;
+    if (!socket || !otherUser || typeof window === 'undefined') return;
 
     let stream = null;
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: callType === "video",
+          video: callType === 'video',
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
@@ -250,12 +250,11 @@ export const CallProvider = ({ children }) => {
         setLocalStream(stream);
       }
     } catch (err) {
-      console.warn("Failed to accept call media stream:", err);
-      toast.info("Connected (Camera/Mic blocked or unavailable)");
+      console.warn('Failed to accept call media stream:', err);
+      toast.info('Connected (Camera/Mic blocked or unavailable)');
     }
 
     try {
-      // Add local tracks to our pre-configured RTCPeerConnection
       if (pcRef.current) {
         if (stream) {
           stream.getTracks().forEach((track) => pcRef.current.addTrack(track, stream));
@@ -266,21 +265,20 @@ export const CallProvider = ({ children }) => {
           answer = await pcRef.current.createAnswer();
           await pcRef.current.setLocalDescription(answer);
         } catch (e) {
-          console.warn("Failed to create RTC answer, using fallback:", e);
-          answer = { type: "answer", sdp: pcRef.current.localDescription?.sdp || "" };
+          console.warn('Failed to create RTC answer, using fallback:', e);
+          answer = { type: 'answer', sdp: pcRef.current.localDescription?.sdp || '' };
         }
 
-        // Emit answer
-        socket.emit("answer-call", {
+        socket.emit('answer-call', {
           to: otherUser._id,
           answer,
         });
 
-        setCallState("connected");
+        setCallState('connected');
       }
     } catch (err) {
-      console.error("WebRTC answer setup failed:", err);
-      toast.error("Failed to establish WebRTC connection.");
+      console.error('WebRTC answer setup failed:', err);
+      toast.error('Failed to establish WebRTC connection.');
       declineCall();
     }
   };
@@ -288,9 +286,9 @@ export const CallProvider = ({ children }) => {
   // Decline/End call
   const declineCall = () => {
     if (socket && otherUser) {
-      socket.emit("end-call", { to: otherUser._id });
+      socket.emit('end-call', { to: otherUser._id });
     }
-    setCallState("idle");
+    setCallState('idle');
     cleanupStreams();
   };
 

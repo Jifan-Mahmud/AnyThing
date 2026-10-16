@@ -1,19 +1,41 @@
 import { auth } from "../config/auth.js";
 import User from "../models/User.js";
 import { sendError } from "../utils/apiResponse.js";
+import { verifyToken } from "../utils/jwt.js";
 
 /**
  * requireAuth middleware
  * ───────────────────────────────────────────────────────────────────────────
- * 1. Asks better-auth to validate the session cookie from the request.
- * 2. Looks up the corresponding User profile in our DB.
- * 3. Attaches `req.user` (app-level profile) and `req.authUser` (better-auth
- *    session user) so downstream controllers have everything they need.
- * 4. Returns 401 if no valid session exists.
+ * 1. Checks for JWT token in Authorization header (Bearer <token>) or cookie.
+ * 2. If valid JWT, finds and attaches the user profile.
+ * 3. Falls back to better-auth session validation if no valid JWT.
+ * 4. Lazy-creates app user profile if needed.
+ * 5. Returns 401 if unauthorized.
  */
 const requireAuth = async (req, res, next) => {
   try {
-    // better-auth reads cookies / Authorization header internally
+    // 1. Try JWT Bearer token or token cookie first
+    let token = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else if (req.cookies?.token) {
+      token = req.cookies.token;
+    }
+
+    if (token) {
+      const jwtPayload = await verifyToken(token);
+      if (jwtPayload && (jwtPayload.userId || jwtPayload.id)) {
+        const user = await User.findById(jwtPayload.userId || jwtPayload.id);
+        if (user) {
+          req.user = user;
+          req.authUser = { id: user.authUserId || user._id.toString() };
+          return next();
+        }
+      }
+    }
+
+    // 2. Fall back to better-auth session
     const session = await auth.api.getSession({
       headers: req.headers,
     });
@@ -61,3 +83,4 @@ const requireAuth = async (req, res, next) => {
 };
 
 export default requireAuth;
+
