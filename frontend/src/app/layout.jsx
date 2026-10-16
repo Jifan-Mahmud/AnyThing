@@ -1,5 +1,8 @@
 import './globals.css';
+import { Inter } from 'next/font/google';
 import ClientProviders from '../components/providers/ClientProviders';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
   title: 'AnyThing - Connect, Share & Express Yourself',
@@ -9,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-bg-darker text-white antialiased min-h-screen">
+      <body className={`${inter.className} bg-bg-darker text-white antialiased min-h-screen`}>
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

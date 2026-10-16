@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   --color-primary-pink: #ff69b4;
   --color-primary-pink-hover: #ff1493;
   --color-bg-dark: #121212;
@@ -13,14 +13,58 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ffffff;
+  --primary-pink: #ff69b4;
+  --primary-pink-hover: #ff1493;
+  --bg-dark: #121212;
+  --bg-darker: #0a0a0a;
+  --surface: #1e1e1e;
+  --surface-light: #2c2c2c;
 }
 
 body {
-  background-color: var(--color-bg-darker, #0a0a0a);
-  color: var(--foreground, #ffffff);
+  background-color: var(--bg-darker);
+  color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
+
+/* Explicit Color Utilities */
+.text-primary-pink { color: #ff69b4 !important; }
+.text-primary-pink-hover { color: #ff1493 !important; }
+.hover\:text-primary-pink:hover { color: #ff69b4 !important; }
+.hover\:text-primary-pink-hover:hover { color: #ff1493 !important; }
+.text-primary-pink\/80 { color: rgba(255, 105, 180, 0.8) !important; }
+
+.bg-primary-pink { background-color: #ff69b4 !important; }
+.bg-primary-pink-hover { background-color: #ff1493 !important; }
+.hover\:bg-primary-pink-hover:hover { background-color: #ff1493 !important; }
+.hover\:bg-primary-pink:hover { background-color: #ff69b4 !important; }
+.bg-primary-pink\/10 { background-color: rgba(255, 105, 180, 0.1) !important; }
+.bg-primary-pink\/15 { background-color: rgba(255, 105, 180, 0.15) !important; }
+.bg-primary-pink\/20 { background-color: rgba(255, 105, 180, 0.2) !important; }
+.bg-primary-pink\/30 { background-color: rgba(255, 105, 180, 0.3) !important; }
+
+.border-primary-pink { border-color: #ff69b4 !important; }
+.border-primary-pink\/20 { border-color: rgba(255, 105, 180, 0.2) !important; }
+.border-primary-pink\/30 { border-color: rgba(255, 105, 180, 0.3) !important; }
+.border-primary-pink\/40 { border-color: rgba(255, 105, 180, 0.4) !important; }
+.border-primary-pink\/50 { border-color: rgba(255, 105, 180, 0.5) !important; }
+.focus\:border-primary-pink\/50:focus { border-color: rgba(255, 105, 180, 0.5) !important; }
+.focus\:ring-primary-pink\/30:focus { --tw-ring-color: rgba(255, 105, 180, 0.3) !important; }
+.focus\:ring-primary-pink\/50:focus { --tw-ring-color: rgba(255, 105, 180, 0.5) !important; }
+.ring-primary-pink { --tw-ring-color: #ff69b4 !important; }
+.ring-offset-bg-darker { --tw-ring-offset-color: #0a0a0a !important; }
+
+.bg-bg-dark { background-color: #121212 !important; }
+.bg-bg-darker { background-color: #0a0a0a !important; }
+.border-bg-darker { border-color: #0a0a0a !important; }
+.bg-surface { background-color: #1e1e1e !important; }
+.bg-surface-light { background-color: #2c2c2c !important; }
+.border-surface { border-color: #1e1e1e !important; }
+.border-surface-light { border-color: #2c2c2c !important; }
+
+.from-primary-pink { --tw-gradient-from: #ff69b4 var(--tw-gradient-from-position) !important; }
+.to-\[\#ff1493\] { --tw-gradient-to: #ff1493 var(--tw-gradient-to-position) !important; }
 
 .glass-panel {
   background: rgba(30, 30, 30, 0.65);
