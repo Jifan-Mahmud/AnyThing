@@ -54,13 +54,16 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
 
   if (!conversation) {
     return (
-      <div className="hidden md:flex flex-1 items-center justify-center flex-col text-gray-500 bg-bg-darker relative overflow-hidden">
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full glass-panel flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,105,180,0.15)]">
-            <Send size={40} className="text-primary-pink opacity-80" />
+      <div className="hidden md:flex flex-1 items-center justify-center flex-col text-zinc-500 bg-bg-darker relative overflow-hidden select-none">
+        <div className="aurora-bg w-96 h-96 bg-primary-pink/10 top-1/3 left-1/3" />
+        <div className="relative z-10 flex flex-col items-center text-center p-6">
+          <div className="w-20 h-20 rounded-3xl glass-panel flex items-center justify-center mb-5 border border-white/10 shadow-2xl">
+            <Send size={32} className="text-primary-pink text-glow" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">Your Messages</h3>
-          <p className="text-sm">Select a chat to start messaging</p>
+          <h3 className="text-2xl font-black text-white tracking-tight mb-2">Direct Messages</h3>
+          <p className="text-sm text-zinc-400 max-w-xs">
+            Select a conversation on the left to start sending real-time messages and media.
+          </p>
         </div>
       </div>
     );
@@ -73,47 +76,51 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
 
   return (
     <div className="flex flex-col h-full flex-1 bg-bg-darker relative overflow-hidden">
+      {/* Ambient background glow */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.05) 0%, transparent 50%)',
-        }}
-      ></div>
+        className="aurora-bg w-80 h-80 bg-primary-pink/10 -top-20 -right-20 pointer-events-none"
+        style={{ animationDuration: '18s' }}
+      />
 
       {/* Header */}
-      <div className="flex items-center justify-between p-3 md:p-4 border-b border-white/5 bg-bg-darker/80 backdrop-blur-md z-10 sticky top-0 shrink-0">
-        <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-white/5 bg-bg-darker/80 backdrop-blur-xl z-10 sticky top-0 shrink-0">
+        <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="md:hidden p-2 -ml-2 text-white hover:bg-white/10 rounded-full transition-colors"
+            className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white rounded-full transition-colors"
+            aria-label="Back to contacts"
           >
             <svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-6 h-6"
+              className="w-5 h-5"
             >
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           <div className="relative">
             <Avatar src={otherParticipant.avatarUrl} size="md" isOnline={true} />
-            <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-bg-darker rounded-full"></span>
           </div>
           <div>
-            <h3 className="font-semibold text-white">{otherParticipant.username}</h3>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-pink animate-pulse"></span>
-              <p className="text-xs text-primary-pink font-medium">Active Now</p>
+            <h3 className="font-bold text-sm text-white tracking-tight leading-tight">
+              {otherParticipant.username}
+            </h3>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <p className="text-[11px] text-zinc-400 font-medium">Online now</p>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
+
+        {/* Call & Action Buttons */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={() =>
               startCall(
                 otherParticipant._id,
@@ -122,11 +129,14 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
                 otherParticipant.avatarUrl
               )
             }
-            className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
+            className="p-2 sm:p-2.5 text-zinc-400 hover:text-primary-pink hover:bg-white/5 rounded-full transition-all cursor-pointer"
+            aria-label="Start video call"
           >
-            <Video size={20} />
-          </button>
-          <button
+            <Video size={19} />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={() =>
               startCall(
                 otherParticipant._id,
@@ -135,18 +145,22 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
                 otherParticipant.avatarUrl
               )
             }
-            className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
+            className="p-2 sm:p-2.5 text-zinc-400 hover:text-primary-pink hover:bg-white/5 rounded-full transition-all cursor-pointer"
+            aria-label="Start audio call"
           >
-            <Phone size={20} />
-          </button>
-          <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all">
-            <MoreVertical size={20} />
+            <Phone size={19} />
+          </motion.button>
+          <button
+            className="p-2 sm:p-2.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
+            aria-label="More options"
+          >
+            <MoreVertical size={19} />
           </button>
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 z-0 scroll-smooth">
+      {/* Messages Stream */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 z-0 scroll-smooth">
         {messages.map((msg) => {
           const isMe = (msg.senderId?._id || msg.senderId) === user?._id;
           return (
@@ -157,39 +171,39 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
               className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}
             >
               <div
-                className={`flex max-w-[75%] gap-2 ${
+                className={`flex max-w-[80%] sm:max-w-[70%] gap-2.5 ${
                   isMe ? 'flex-row-reverse' : 'flex-row'
                 } items-end`}
               >
                 <Avatar
                   src={isMe ? myAvatar : otherParticipant?.avatarUrl}
                   size="sm"
-                  className="mb-4 flex-shrink-0"
+                  className="mb-3 shrink-0"
                 />
                 <div className="flex flex-col">
                   <div
-                    className={`px-4 py-3 text-sm shadow-sm ${
+                    className={`px-4 py-2.5 text-xs sm:text-sm font-medium shadow-md leading-relaxed whitespace-pre-wrap ${
                       isMe
-                        ? 'bg-gradient-to-br from-primary-pink to-[#ff1493] text-white rounded-2xl rounded-tr-sm shadow-[0_4px_15px_rgba(255,105,180,0.25)]'
-                        : 'glass-panel text-gray-100 rounded-2xl rounded-tl-sm border border-white/10'
+                        ? 'bg-gradient-to-tr from-primary-pink to-[#ff1c7a] text-white rounded-2xl rounded-br-xs shadow-primary-pink/20'
+                        : 'glass-panel text-zinc-200 rounded-2xl rounded-bl-xs border border-white/10'
                     }`}
                   >
-                    <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                    {msg.text}
                   </div>
                   <div
-                    className={`flex items-center gap-1 mt-1 ${
+                    className={`flex items-center gap-1 mt-1 text-[10px] text-zinc-500 font-medium ${
                       isMe ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    <span className="text-[10px] text-gray-500 font-medium">
+                    <span>
                       {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
                     </span>
                     {isMe && (
-                      <span className={msg.seen ? 'text-blue-400' : 'text-gray-500'}>
-                        {msg.seen ? <CheckCheck size={14} /> : <Check size={14} />}
+                      <span className={msg.seen ? 'text-primary-pink' : 'text-zinc-500'}>
+                        {msg.seen ? <CheckCheck size={13} /> : <Check size={13} />}
                       </span>
                     )}
                   </div>
@@ -201,28 +215,35 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-white/5 bg-bg-darker/90 backdrop-blur-md z-10 pb-6 md:pb-4">
-        <div className="flex items-end gap-2 bg-surface p-1.5 rounded-[2rem] transition-all shadow-inner relative border border-white/5">
-          {/* Emoji Picker Popover */}
-          {showEmojis && (
-            <div className="absolute bottom-full right-4 mb-2 bg-surface border border-white/10 rounded-2xl p-3 shadow-2xl glass-panel animate-in zoom-in-95 duration-200 z-50">
-              <div className="grid grid-cols-6 gap-2">
-                {EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => addEmoji(emoji)}
-                    className="text-xl hover:scale-125 transition-transform p-1"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Message Input Bar */}
+      <div className="p-3 sm:p-4 border-t border-white/5 bg-bg-darker/90 backdrop-blur-xl z-10">
+        <div className="flex items-end gap-2 bg-surface/80 p-1.5 rounded-full relative border border-white/10 focus-within:border-primary-pink/40 shadow-inner">
+          {/* Emoji Popover */}
+          <AnimatePresence>
+            {showEmojis && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                className="absolute bottom-full right-4 mb-3 bg-surface border border-white/10 rounded-2xl p-3 shadow-2xl glass-panel z-50"
+              >
+                <div className="grid grid-cols-6 gap-2">
+                  {EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => addEmoji(emoji)}
+                      className="text-lg hover:scale-125 transition-transform p-1 cursor-pointer"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors flex-shrink-0">
-            <Plus size={22} />
+          <button className="p-2.5 text-zinc-400 hover:text-white rounded-full transition-colors shrink-0">
+            <Plus size={20} />
           </button>
 
           <div className="flex-1 relative">
@@ -230,40 +251,35 @@ const ActiveChat = ({ conversation, messages = [], onBack }) => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Message..."
-              className="w-full bg-transparent text-white py-3 px-2 focus:outline-none text-sm resize-none max-h-32 min-h-[44px] border-none"
+              placeholder="Write a message..."
+              className="w-full bg-transparent text-white py-2.5 px-2 focus:outline-none text-xs sm:text-sm resize-none max-h-32 min-h-[40px] border-none font-medium placeholder-zinc-500"
               rows={1}
             />
           </div>
 
           <div className="flex items-center gap-1 pr-1 pb-0.5">
-            {!message.trim() && !showEmojis && (
-              <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors flex-shrink-0">
-                <Mic size={20} />
-              </button>
-            )}
-
             <button
               onClick={() => setShowEmojis(!showEmojis)}
-              className={`p-2.5 rounded-full transition-colors flex-shrink-0 ${
+              className={`p-2 rounded-full transition-colors shrink-0 cursor-pointer ${
                 showEmojis
-                  ? 'text-primary-pink bg-primary-pink/10'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'text-primary-pink bg-primary-pink/15'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Smile size={20} />
+              <Smile size={19} />
             </button>
 
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={handleSend}
-              className={`p-2.5 rounded-full transition-all duration-200 flex-shrink-0 flex items-center justify-center ${
+              disabled={!message.trim()}
+              className={`p-2.5 rounded-full transition-all duration-200 shrink-0 flex items-center justify-center cursor-pointer ${
                 message.trim()
-                  ? 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-[0_0_15px_rgba(255,105,180,0.4)] scale-100'
-                  : 'bg-surface-light text-gray-400 scale-90 opacity-0 pointer-events-none'
+                  ? 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-lg shadow-primary-pink/30 scale-100 opacity-100'
+                  : 'bg-white/5 text-zinc-500 scale-90 opacity-40 pointer-events-none'
               }`}
             >
-              <Send size={18} className="ml-0.5" />
+              <Send size={16} className="ml-0.5" />
             </motion.button>
           </div>
         </div>

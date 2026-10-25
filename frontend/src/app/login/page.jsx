@@ -3,115 +3,161 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Globe, MessageSquare, Code, ChevronLeft, ArrowRight, Loader2 } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  ChevronLeft,
+  ArrowRight,
+  Loader2,
+  Eye,
+  EyeOff,
+  Zap,
+  Sparkles,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'motion/react';
-
-const EMOJIS = ['😋', '😎', '🤣', '❤️', '👍', '😒', '😄', '😍', '😂', '😁', '😉', '🙌', '🤦‍♀️', '🤩', '😴', '🤤'];
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       router.replace('/app');
+    } else {
+      setErrorMsg(result.message || 'Invalid email or password');
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg-dark font-sans text-white relative overflow-hidden flex items-center justify-center p-4">
-      {/* Floating Emojis Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-100">
-        {EMOJIS.map((emoji, idx) => (
-          <div
-            key={idx}
-            className="absolute animate-fly-up opacity-0"
-            style={{
-              left: `${(idx * 6.5) % 100}%`,
-              animationDuration: `${10 + (idx % 4) * 3}s`,
-              animationDelay: `${(idx % 3) * 1.5}s`,
-              fontSize: `${1.5 + (idx % 2) * 0.5}rem`,
-            }}
-          >
-            {emoji}
-          </div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-bg-darker font-sans text-white relative overflow-hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      {/* Ambient Aurora Glows */}
+      <div
+        className="aurora-bg w-[500px] h-[500px] bg-primary-pink/15 -top-20 -left-20"
+        style={{ animationDuration: '14s' }}
+      />
+      <div
+        className="aurora-bg w-[450px] h-[450px] bg-purple-600/15 -bottom-20 -right-20"
+        style={{ animationDuration: '18s', animationDelay: '-6s' }}
+      />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-8 flex items-center gap-2 text-white/40 hover:text-primary-pink transition-colors font-bold group"
-        >
-          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          Back
-        </button>
-
-        {/* Form Card */}
+        {/* Top Back Navigation */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="bg-surface/40 border border-white/10 backdrop-blur-2xl rounded-[40px] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-6 flex items-center justify-between"
         >
-          {/* Decorative Pink Glow */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary-pink/20 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-pink/10 rounded-full blur-[100px]" />
+          <button
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition-colors group"
+          >
+            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </button>
 
-          <div className="text-center mb-10 relative z-10">
-            <h1 className="text-4xl font-black italic tracking-tighter mb-2">
-              Any<span className="text-primary-pink drop-shadow-[0_0_10px_rgba(255,182,193,0.5)]">Thing</span>
+          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-400">
+            <Sparkles className="w-3 h-3 text-primary-pink" />
+            <span>Secure Access</span>
+          </div>
+        </motion.div>
+
+        {/* Auth Glass Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="glass-panel border border-white/10 rounded-3xl sm:rounded-[36px] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
+        >
+          {/* Header & Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-pink to-purple-600 items-center justify-center shadow-lg shadow-primary-pink/25 mb-4">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black italic tracking-tight">
+              Any<span className="text-primary-pink text-glow">Thing</span>
             </h1>
-            <p className="text-white/40 font-medium">Welcome back! Please login.</p>
+            <p className="text-xs sm:text-sm text-zinc-400 mt-2 font-medium">
+              Welcome back! Step into your creative sphere.
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4 relative z-10">
-            <div className="relative group">
-              <Mail
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-pink transition-colors"
-                size={20}
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm"
-              />
+          {/* Error Message */}
+          {errorMsg && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold text-center"
+            >
+              {errorMsg}
+            </motion.div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-zinc-300">
+                Email Address
+              </label>
+              <div className="relative group">
+                <Mail
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-pink transition-colors"
+                  size={18}
+                />
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium"
+                />
+              </div>
             </div>
 
-            <div className="relative group">
-              <Lock
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-pink transition-colors"
-                size={20}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm"
-              />
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="text-xs text-white/30 hover:text-primary-pink font-bold transition-colors"
-              >
-                Forgot Password?
-              </button>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-zinc-300">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  className="text-[11px] text-zinc-400 hover:text-primary-pink font-semibold transition-colors"
+                >
+                  Forgot?
+                </button>
+              </div>
+              <div className="relative group">
+                <Lock
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-pink transition-colors"
+                  size={18}
+                />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••••••"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-11 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <motion.button
@@ -119,52 +165,34 @@ export default function LoginPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-pink text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all shadow-xl shadow-primary-pink/20 mt-6 flex items-center justify-center gap-2 group disabled:opacity-50"
+              className="w-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-primary-pink/25 mt-6 flex items-center justify-center gap-2 group disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="animate-spin" size={20} />
-                  Logging In...
+                  <Loader2 className="animate-spin" size={18} />
+                  <span className="text-sm">Signing in...</span>
                 </>
               ) : (
                 <>
-                  Log In
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  <span className="text-sm">Sign In</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </motion.button>
           </form>
 
-          <div className="relative flex items-center justify-center my-8 z-10">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5"></div>
-            </div>
-            <span className="relative px-4 bg-transparent text-[10px] text-white/20 uppercase tracking-widest font-bold">
-              Or login with
-            </span>
+          {/* Bottom Switcher */}
+          <div className="mt-8 pt-6 border-t border-white/5 text-center">
+            <p className="text-xs text-zinc-400 font-medium">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup"
+                className="text-primary-pink font-bold hover:underline underline-offset-4 ml-1"
+              >
+                Create Account
+              </Link>
+            </p>
           </div>
-
-          <div className="flex gap-4 relative z-10">
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <Globe size={20} />
-            </button>
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <MessageSquare size={20} />
-            </button>
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <Code size={20} />
-            </button>
-          </div>
-
-          <p className="text-center text-sm text-white/40 mt-10 font-medium relative z-10">
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/signup"
-              className="text-primary-pink font-black hover:underline underline-offset-4"
-            >
-              Sign Up
-            </Link>
-          </p>
         </motion.div>
       </div>
     </div>

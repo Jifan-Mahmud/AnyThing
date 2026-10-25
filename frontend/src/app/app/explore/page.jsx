@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Film, X, ArrowLeft } from 'lucide-react';
+import { Search, Film, X, ArrowLeft, Sparkles, Compass } from 'lucide-react';
 import PostCard from '../../../components/feed/PostCard';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { motion, AnimatePresence } from 'motion/react';
+
+const CATEGORIES = ['All', 'Trending', 'Reels', 'Design', 'Motion', 'Photography'];
 
 const MOCK_EXPLORE_POSTS = [
   {
@@ -13,13 +15,13 @@ const MOCK_EXPLORE_POSTS = [
     size: 'small',
     image:
       'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
-    likes: '1.2k',
+    likes: 1200,
     comments: 34,
     user: {
       username: 'creative_soul',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=c1',
     },
-    caption: 'Loving these neon aesthetics! 💜',
+    caption: 'Loving these neon obsidian aesthetics! 💜',
     timeAgo: '2h ago',
   },
   {
@@ -27,14 +29,14 @@ const MOCK_EXPLORE_POSTS = [
     type: 'reel',
     size: 'large',
     image:
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop',
-    likes: '2.4k',
+      'https://res.cloudinary.com/mmquu2ps/video/upload/v1785047869/posts/nixnmu8iap3w0vqhajeb.mp4',
+    likes: 2400,
     comments: 124,
     user: {
       username: 'tech_guru',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=c2',
     },
-    caption: 'Future of tech is here! 💻',
+    caption: 'Future of social media connection is here! 💻',
     timeAgo: '4h ago',
   },
   {
@@ -43,7 +45,7 @@ const MOCK_EXPLORE_POSTS = [
     size: 'small',
     image:
       'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=800&auto=format&fit=crop',
-    likes: '8k',
+    likes: 8100,
     comments: 400,
     user: {
       username: 'design_daily',
@@ -59,6 +61,7 @@ export default function ExplorePage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   const fetchExplorePosts = async () => {
     setLoading(true);
@@ -152,21 +155,38 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 md:px-8 py-6">
-      {/* Search Bar */}
-      <div className="mb-6 sticky top-0 z-10 bg-bg-darker/80 backdrop-blur-md py-2">
-        <div className="relative w-full max-w-md mx-auto">
+    <div className="flex flex-col h-full w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+      {/* Search Bar & Categories Header */}
+      <div className="mb-6 sticky top-0 z-20 bg-bg-darker/80 backdrop-blur-xl py-3 border-b border-white/5">
+        <div className="relative w-full max-w-lg mx-auto mb-3">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search size={20} className="text-gray-400" />
+            <Search size={18} className="text-zinc-500" />
           </div>
           <input
             type="text"
-            placeholder="Search username & press Enter"
+            placeholder="Search creators & press Enter..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearchSubmit}
-            className="w-full bg-surface text-white rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-pink/50 transition-all border border-white/5"
+            className="w-full bg-white/5 text-white rounded-2xl py-2.5 pl-11 pr-4 focus:outline-none focus:border-primary-pink/50 border border-white/10 transition-all text-xs sm:text-sm font-medium placeholder-zinc-500 shadow-inner"
           />
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === cat
+                  ? 'bg-primary-pink text-white shadow-md shadow-primary-pink/25'
+                  : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -179,8 +199,8 @@ export default function ExplorePage() {
           />
         </div>
       ) : posts.length > 0 ? (
-        /* Explore Grid */
-        <div className="grid grid-cols-3 gap-1.5 md:gap-4 auto-rows-[120px] sm:auto-rows-[160px] md:auto-rows-[250px]">
+        /* Bento Explore Grid */
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 auto-rows-[140px] sm:auto-rows-[190px] md:auto-rows-[240px]">
           {posts.map((post) => {
             const isLarge = post.size === 'large';
 
@@ -189,8 +209,8 @@ export default function ExplorePage() {
                 key={post.id}
                 whileHover={{ scale: 1.02 }}
                 onClick={() => setSelectedPost(post)}
-                className={`relative group cursor-pointer overflow-hidden bg-surface rounded-xl md:rounded-2xl shadow-md ${
-                  isLarge ? 'row-span-2' : ''
+                className={`relative group cursor-pointer overflow-hidden bg-surface rounded-2xl border border-white/5 shadow-md ${
+                  isLarge ? 'row-span-2 col-span-1' : ''
                 }`}
               >
                 {post.type === 'reel' ? (
@@ -211,22 +231,23 @@ export default function ExplorePage() {
                     src={post.image}
                     alt="Explore post"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
                   />
                 )}
 
                 {post.type === 'reel' && (
-                  <div className="absolute top-2 right-2 text-white drop-shadow-md">
-                    <Film size={20} className="fill-white/80" />
+                  <div className="absolute top-3 right-3 text-white drop-shadow-md">
+                    <Film size={18} className="fill-white/80" />
                   </div>
                 )}
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-4 md:gap-6 transition-opacity duration-300">
-                  <div className="flex items-center gap-1 md:gap-2 text-white font-bold text-sm md:text-base">
-                    <span className="text-lg md:text-xl text-primary-pink">♥</span> {post.likes}
+                {/* Hover Backdrop Overlay with Likes */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-5 transition-opacity duration-300 backdrop-blur-[2px]">
+                  <div className="flex items-center gap-1.5 text-white font-bold text-xs sm:text-sm">
+                    <span className="text-primary-pink">♥</span> {post.likes}
                   </div>
-                  <div className="flex items-center gap-1 md:gap-2 text-white font-bold text-sm md:text-base">
-                    <span className="text-lg md:text-xl">💬</span> {post.comments}
+                  <div className="flex items-center gap-1.5 text-white font-bold text-xs sm:text-sm">
+                    <span>💬</span> {post.comments}
                   </div>
                 </div>
               </motion.div>
@@ -234,25 +255,29 @@ export default function ExplorePage() {
           })}
         </div>
       ) : (
-        <div className="text-center py-20 text-gray-500">
-          <p className="font-semibold text-lg">No posts or users found.</p>
+        <div className="glass-panel rounded-3xl p-12 text-center border border-white/5 my-12">
+          <div className="w-12 h-12 rounded-2xl bg-white/5 mx-auto flex items-center justify-center text-zinc-500 mb-3">
+            <Compass className="w-6 h-6" />
+          </div>
+          <h4 className="font-bold text-base text-white mb-1">No media found</h4>
+          <p className="text-xs text-zinc-400">Try a different search query or explore all categories.</p>
         </div>
       )}
 
       {/* Post Modal */}
       <AnimatePresence>
         {selectedPost && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4 bg-black/95 md:bg-black/80 backdrop-blur-sm">
-            {/* Mobile Top Header Bar */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md">
+            {/* Mobile Header Bar */}
             <div className="fixed top-0 inset-x-0 h-14 bg-bg-darker/90 backdrop-blur-md border-b border-white/5 flex items-center px-4 justify-between z-50 md:hidden">
               <button
                 onClick={() => setSelectedPost(null)}
-                className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold active:scale-95 transition-transform"
+                className="text-zinc-300 hover:text-white flex items-center gap-1.5 text-xs font-bold"
               >
-                <ArrowLeft size={20} /> Back
+                <ArrowLeft size={18} /> Back
               </button>
-              <span className="text-sm font-bold text-white tracking-wide">Post</span>
-              <div className="w-10" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">Post Details</span>
+              <div className="w-8" />
             </div>
 
             <motion.div
@@ -263,9 +288,10 @@ export default function ExplorePage() {
             >
               <button
                 onClick={() => setSelectedPost(null)}
-                className="hidden md:block absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors backdrop-blur-md"
+                className="hidden md:block absolute top-4 right-4 z-50 p-2 bg-black/60 hover:bg-black/90 rounded-full text-white transition-colors backdrop-blur-md cursor-pointer"
+                aria-label="Close"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
               <div className="min-h-full flex flex-col justify-center pt-16 md:pt-0">
                 <PostCard post={selectedPost} />

@@ -2,13 +2,64 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Video, MessageCircle, Globe, Camera, Star } from 'lucide-react';
+import {
+  Video,
+  MessageCircle,
+  Globe,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Users,
+  Compass,
+  Heart,
+  TrendingUp,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 
-const EMOJIS = [
-  '😋', '😎', '🤣', '❤️', '👍', '😒', '😄', '😍', '😂', '😁',
-  '😉', '🙌', '🤦‍♀️', '😎', '😋', '🤩', '😴', '😫', '😪', '🤤',
+const FLOATING_EMOJIS = ['✨', '🔥', '💖', '🚀', '🌟', '⚡', '💫', '🎉'];
+
+const FEATURES = [
+  {
+    icon: MessageCircle,
+    title: 'Instant Realtime Chat',
+    description: 'Ultra-low latency direct messaging, typing indicators, and instant read receipts powered by WebSockets.',
+    color: 'from-pink-500/20 to-purple-500/20',
+    border: 'border-pink-500/30',
+    iconColor: 'text-primary-pink',
+  },
+  {
+    icon: Video,
+    title: 'HD Video & Audio Calls',
+    description: 'Peer-to-peer crystal clear WebRTC calls. Connect face-to-face with friends anywhere across the globe.',
+    color: 'from-purple-500/20 to-indigo-500/20',
+    border: 'border-purple-500/30',
+    iconColor: 'text-purple-400',
+  },
+  {
+    icon: Sparkles,
+    title: 'Immersive Reels & Stories',
+    description: 'Express your day with high-res 24h disappearing stories and full-screen vertical reels with audio.',
+    color: 'from-pink-500/20 to-rose-500/20',
+    border: 'border-rose-500/30',
+    iconColor: 'text-rose-400',
+  },
+  {
+    icon: Compass,
+    title: 'Dynamic Discovery',
+    description: 'Discover creators tailored to your vibe. Explore trending media, hashtags, and fresh ideas instantly.',
+    color: 'from-cyan-500/20 to-blue-500/20',
+    border: 'border-cyan-500/30',
+    iconColor: 'text-cyan-400',
+  },
+];
+
+const STATS = [
+  { label: 'Active Creators', value: '150K+', change: '+24% this week' },
+  { label: 'Daily Interactions', value: '2.4M', change: 'Realtime live' },
+  { label: 'Latency Speed', value: '<45ms', change: 'Global edge sync' },
+  { label: 'Creator Satisfaction', value: '99.8%', change: 'Top rated' },
 ];
 
 export default function LandingPage() {
@@ -22,229 +73,335 @@ export default function LandingPage() {
   }, [loading, user, router]);
 
   return (
-    <div className="min-h-screen bg-bg-dark font-sans text-white relative overflow-hidden flex flex-col transition-colors duration-700">
-      {/* Floating Emojis Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-100">
-        {EMOJIS.map((emoji, idx) => {
-          const leftPos = `${(idx * 5.2) % 100}%`;
-          const animDuration = `${10 + (idx % 5) * 3}s`;
-          const animDelay = `${(idx % 4) * 1.5}s`;
-          const fontSize = `${1.5 + (idx % 3) * 0.5}rem`;
+    <div className="min-h-screen bg-bg-darker text-white font-sans relative overflow-x-hidden selection:bg-primary-pink selection:text-white">
+      {/* Ambient Aurora Glows */}
+      <div
+        className="aurora-bg w-[550px] h-[550px] bg-primary-pink/15 -top-40 -left-20"
+        style={{ animationDuration: '16s' }}
+      />
+      <div
+        className="aurora-bg w-[650px] h-[650px] bg-purple-600/10 -top-20 -right-40"
+        style={{ animationDuration: '22s', animationDelay: '-4s' }}
+      />
+      <div
+        className="aurora-bg w-[500px] h-[500px] bg-primary-pink/10 bottom-40 left-1/3"
+        style={{ animationDuration: '18s', animationDelay: '-8s' }}
+      />
 
-          return (
-            <div
-              key={idx}
-              className="absolute animate-fly-up opacity-0"
-              style={{
-                left: leftPos,
-                animationDuration: animDuration,
-                animationDelay: animDelay,
-                fontSize: fontSize,
-              }}
-            >
-              {emoji}
-            </div>
-          );
-        })}
+      {/* Floating Emojis Subtle Stream */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-40">
+        {FLOATING_EMOJIS.map((emoji, idx) => (
+          <div
+            key={idx}
+            className="absolute animate-fly-up"
+            style={{
+              left: `${(idx * 12.5) % 95}%`,
+              animationDuration: `${14 + (idx % 4) * 3}s`,
+              animationDelay: `${idx * 1.8}s`,
+              fontSize: '1.5rem',
+            }}
+          >
+            {emoji}
+          </div>
+        ))}
       </div>
 
-      {/* Navbar */}
-      <nav className="flex justify-between items-center p-4 sm:p-6 lg:px-12 relative z-10">
+      {/* Navigation Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-bg-darker/70 border-b border-white/5 transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-2 cursor-pointer group"
+            onClick={() => router.push('/')}
+          >
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary-pink to-purple-600 flex items-center justify-center shadow-lg shadow-primary-pink/20 group-hover:scale-105 transition-transform">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-2xl font-black italic tracking-tight">
+              Any<span className="text-primary-pink text-glow">Thing</span>
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-3 sm:gap-4"
+          >
+            <button
+              onClick={() => router.push('/login')}
+              className="px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-all"
+            >
+              Log In
+            </button>
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => router.push('/signup')}
+              className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-bold bg-primary-pink hover:bg-primary-pink-hover text-white transition-all shadow-lg shadow-primary-pink/25 hover:shadow-primary-pink/40"
+            >
+              Get Started
+            </motion.button>
+          </motion.div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative z-10 pt-16 sm:pt-24 lg:pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center flex flex-col items-center">
+        {/* Subtitle Badge */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => router.push('/')}
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-zinc-300 mb-8 backdrop-blur-md"
         >
-          <div className="text-xl sm:text-2xl font-black tracking-tighter italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-            Any<span className="text-primary-pink">Thing</span>
-          </div>
+          <span className="w-2 h-2 rounded-full bg-primary-pink animate-pulse" />
+          <span>The Next Evolution of Social Media</span>
+          <Sparkles className="w-3.5 h-3.5 text-primary-pink ml-1" />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-full p-1 sm:p-1.5 flex items-center gap-1 sm:gap-2 border border-white/10 shadow-xl shrink-0"
+        {/* Primary Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] max-w-5xl"
         >
-          <button
-            onClick={() => router.push('/login')}
-            className="px-3 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm font-semibold hover:text-primary-pink transition-colors"
-          >
-            LogIn
-          </button>
+          Engage, Evolve & <br className="hidden sm:inline" />
+          <span className="text-gradient-pink">Excel on AnyThing</span>
+        </motion.h1>
+
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="mt-6 sm:mt-8 text-base sm:text-xl text-zinc-400 max-w-2xl font-normal leading-relaxed"
+        >
+          A high-performance modern social experience crafted for seamless connection.
+          Instant chats, crystal WebRTC calls, full-screen reels, and active creator communities.
+        </motion.p>
+
+        {/* CTA Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+        >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push('/signup')}
-            className="px-3 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm bg-primary-pink text-white rounded-full font-semibold hover:bg-white hover:text-black transition-all shadow-lg shadow-primary-pink/25"
+            className="w-full sm:w-auto px-8 py-4 rounded-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold text-base shadow-xl shadow-primary-pink/30 flex items-center justify-center gap-2 group transition-all"
           >
-            SignIn
+            <span>Start Free Journey</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </motion.button>
-        </motion.div>
-      </nav>
 
-      {/* Main Content */}
-      <main className="flex-1 relative z-10 flex flex-col items-center pt-8 lg:pt-16 px-4">
-        {/* Headings */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto z-20"
-        >
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            Engage, Evolve, Excel
-            <br />
-            <span className="text-primary-pink">Social Evolution</span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/60 mb-8 font-medium">
-            Social Media Platform & Next-Gen Experience
-          </p>
           <motion.button
-            whileHover={{ scale: 1.08, y: -2 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/signup')}
-            className="px-8 py-4 bg-primary-pink text-white rounded-full font-bold text-lg hover:bg-white hover:text-black transition-all shadow-2xl shadow-primary-pink/30"
+            onClick={() => router.push('/login')}
+            className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white font-semibold text-base border border-white/10 backdrop-blur-md transition-all"
           >
-            Get Started
+            Sign In with Account
           </motion.button>
         </motion.div>
 
-        {/* Center Image & Floating Elements */}
+        {/* Hero Interactive Showcase Bento */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative mt-12 w-full max-w-lg mx-auto z-20 flex justify-center"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.4 }}
+          className="mt-16 sm:mt-24 w-full max-w-5xl relative"
         >
-          <div className="relative p-2 rounded-full bg-gradient-to-tr from-primary-pink to-purple-500">
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
-              alt="Excited user"
-              className="w-64 h-64 md:w-80 md:h-80 object-cover object-top rounded-full z-10 border-4 border-bg-dark shadow-2xl hover:scale-105 transition-transform duration-500"
-            />
-          </div>
+          <div className="glass-panel rounded-3xl sm:rounded-[36px] p-4 sm:p-8 md:p-10 border border-white/10 shadow-2xl relative overflow-hidden">
+            {/* Background Gradient Mesh */}
+            <div className="absolute inset-0 bg-gradient-to-b from-primary-pink/10 via-transparent to-transparent pointer-events-none" />
 
-          {/* Floating Icons */}
-          <div
-            className="absolute top-10 left-10 bg-white/10 backdrop-blur-md p-3 rounded-full shadow-lg animate-bounce border border-white/20"
-            style={{ animationDelay: '0ms', animationDuration: '3s' }}
-          >
-            <Video className="text-primary-pink" size={24} />
-          </div>
-          <div
-            className="absolute top-24 -right-4 bg-white/10 backdrop-blur-md p-3 rounded-full shadow-lg animate-bounce border border-white/20"
-            style={{ animationDelay: '500ms', animationDuration: '2.5s' }}
-          >
-            <MessageCircle className="text-blue-400" size={24} />
-          </div>
-          <div
-            className="absolute bottom-32 -left-8 bg-white/10 backdrop-blur-md p-3 rounded-full shadow-lg animate-bounce border border-white/20"
-            style={{ animationDelay: '1000ms', animationDuration: '3.5s' }}
-          >
-            <Globe className="text-blue-500" size={24} />
-          </div>
-          <div
-            className="absolute bottom-10 right-4 bg-white/10 backdrop-blur-md p-3 rounded-full shadow-lg animate-bounce border border-white/20"
-            style={{ animationDelay: '1500ms', animationDuration: '2.8s' }}
-          >
-            <Camera className="text-primary-pink" size={24} />
-          </div>
+            {/* Showcase Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 items-center">
+              {/* Left Card: Chat Feature Preview */}
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="glass-panel p-5 rounded-2xl border border-white/10 text-left flex flex-col gap-3 shadow-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary-pink/20 flex items-center justify-center text-primary-pink">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">Live Messages</h4>
+                    <p className="text-xs text-zinc-400">Socket.io persistent</p>
+                  </div>
+                </div>
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5 text-xs text-zinc-300">
+                  <span className="text-primary-pink font-semibold">@alex:</span> Just uploaded our new reel, check it out! 🚀
+                </div>
+              </motion.div>
 
-          {/* Circular text badge */}
-          <div className="absolute top-1/2 -left-16 bg-primary-pink text-white w-24 h-24 rounded-full flex items-center justify-center p-2 transform -rotate-12 shadow-2xl hover:rotate-180 hover:scale-110 transition-all duration-700 border-2 border-white/20">
-            <span className="text-[10px] text-center font-bold uppercase leading-tight">
-              Boost your AnyThing now
-            </span>
-            <Star
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/30"
-              size={32}
-            />
+              {/* Center Card: Creator Highlight */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="relative rounded-2xl overflow-hidden border-2 border-primary-pink/40 shadow-2xl shadow-primary-pink/20 aspect-[4/5] max-w-xs mx-auto w-full group"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+                  alt="Featured Creator"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg-darker via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 text-left">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-pink text-white text-[11px] font-bold mb-2">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Featured Creator</span>
+                  </div>
+                  <h3 className="font-bold text-lg text-white">Sara Jenkins</h3>
+                  <p className="text-xs text-zinc-300">Digital Arts & Motion Design</p>
+                </div>
+              </motion.div>
+
+              {/* Right Card: Calling Feature Preview */}
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="glass-panel p-5 rounded-2xl border border-white/10 text-left flex flex-col gap-3 shadow-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+                    <Video className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">WebRTC Calling</h4>
+                    <p className="text-xs text-zinc-400">Peer-to-peer encrypted</p>
+                  </div>
+                </div>
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex items-center justify-between text-xs text-zinc-300">
+                  <span className="flex items-center gap-1.5 text-emerald-400">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Connected
+                  </span>
+                  <span className="text-zinc-500 font-mono">04:12</span>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
+      </section>
 
-        {/* Mobile-Only Responsive Content Section */}
-        <div className="w-full max-w-md mx-auto mt-16 px-4 pb-12 flex flex-col gap-6 lg:hidden relative z-20">
-          <div className="bg-surface/50 backdrop-blur-md rounded-3xl p-6 border border-white/5 text-center">
-            <h2 className="text-xl font-bold leading-snug mb-2">
-              From Likes to Leads, We Drive Results
+      {/* Stats Counter Section */}
+      <section className="relative z-10 py-16 border-y border-white/5 bg-surface/30 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+            {STATS.map((stat, idx) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="flex flex-col items-center text-center p-4 rounded-2xl hover:bg-white/5 transition-colors"
+              >
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient-pink tracking-tight">
+                  {stat.value}
+                </span>
+                <span className="mt-2 text-sm font-semibold text-white">{stat.label}</span>
+                <span className="text-xs text-zinc-500 mt-0.5">{stat.change}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid Section */}
+      <section className="relative z-10 py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-primary-pink mb-3">
+            State of the Art Experience
+          </h2>
+          <h3 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+            Designed for Modern Digital Creators
+          </h3>
+          <p className="mt-4 text-base sm:text-lg text-zinc-400">
+            Everything you need to broadcast your world, interact with true fans, and form lasting bonds.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {FEATURES.map((feature, idx) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/5 hover:border-primary-pink/30 transition-all flex flex-col justify-between group shadow-xl"
+              >
+                <div>
+                  <div
+                    className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${feature.color} flex items-center justify-center mb-6 border ${feature.border} group-hover:scale-110 transition-transform`}
+                  >
+                    <Icon className={`w-7 h-7 ${feature.iconColor}`} />
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-2 group-hover:text-primary-pink transition-colors">
+                    {feature.title}
+                  </h4>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Call To Action Banner */}
+      <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="glass-panel rounded-3xl sm:rounded-[40px] p-8 sm:p-14 lg:p-20 border border-primary-pink/20 text-center relative overflow-hidden shadow-2xl">
+          <div className="absolute -top-32 -right-32 w-80 h-80 bg-primary-pink/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-6">
+              Ready to Upgrade Your Social Life?
             </h2>
-            <p className="text-xs text-gray-400">
-              Thriving Brands, Thrilled Clients - Our AnyThing Management in Action
+            <p className="text-zinc-400 text-base sm:text-lg mb-8">
+              Join thousands of creators who have found their home on AnyThing. Completely free to join.
             </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 bg-surface/50 backdrop-blur-md rounded-3xl p-6 border border-white/5 text-center">
-            <div className="group cursor-default">
-              <h3 className="text-3xl font-extrabold text-primary-pink mb-0.5">500+</h3>
-              <p className="text-[9px] text-gray-500 uppercase tracking-widest">Accounts Managed</p>
-            </div>
-            <div className="group cursor-default">
-              <h3 className="text-3xl font-extrabold text-primary-pink mb-0.5">800+</h3>
-              <p className="text-[9px] text-gray-500 uppercase tracking-widest">Happy Customers</p>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/signup')}
+              className="px-9 py-4 rounded-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold text-lg shadow-2xl shadow-primary-pink/30 transition-all"
+            >
+              Create Account Now
+            </motion.button>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* Decorative Panels (Desktop only) */}
-      <div className="absolute bottom-0 left-0 w-full md:w-1/3 bg-surface/80 backdrop-blur-xl text-white pt-16 pb-12 px-8 lg:px-16 rounded-tr-[80px] lg:rounded-tr-[120px] z-20 border-t border-r border-white/10 shadow-2xl hidden lg:block">
-        <h2 className="text-3xl lg:text-5xl font-bold leading-tight hover:text-primary-pink transition-colors cursor-default">
-          From Likes
-          <br />
-          to Leads,
-          <br />
-          We Drive
-          <br />
-          Results
-        </h2>
-      </div>
-
-      <div className="absolute top-1/2 left-8 bg-surface/90 border border-white/10 backdrop-blur-md text-white rounded-full p-2 flex items-center gap-3 pr-6 shadow-2xl z-30 transform -translate-y-1/2 hidden lg:flex hover:scale-105 transition-transform cursor-pointer">
-        <div className="flex -space-x-3">
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=U1"
-            className="w-10 h-10 rounded-full border-2 border-surface"
-            alt="user"
-          />
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=U2"
-            className="w-10 h-10 rounded-full border-2 border-surface"
-            alt="user"
-          />
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=U3"
-            className="w-10 h-10 rounded-full border-2 border-surface"
-            alt="user"
-          />
-        </div>
-        <div className="text-xs font-bold leading-tight">
-          Check
-          <br />
-          reviews
-        </div>
-      </div>
-
-      <div className="absolute bottom-0 right-0 w-full md:w-[40%] bg-surface/80 backdrop-blur-xl text-white pt-24 pb-12 px-8 lg:px-16 rounded-tl-[100px] lg:rounded-tl-[150px] z-10 flex flex-col items-center text-center border-t border-l border-white/10 shadow-2xl hidden lg:flex">
-        <p className="text-sm lg:text-base font-medium text-gray-400 mb-8 max-w-xs">
-          Thriving Brands, Thrilled Clients - Our AnyThing Management in Action
-        </p>
-
-        <div className="space-y-8 w-full max-w-[200px]">
-          <div className="group cursor-default">
-            <h3 className="text-4xl lg:text-5xl font-bold mb-1 group-hover:text-primary-pink transition-colors duration-300">
-              500+
-            </h3>
-            <p className="text-xs text-gray-500 uppercase tracking-widest">Accounts Managed</p>
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8 relative z-10 text-center text-xs text-zinc-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-white tracking-tight">AnyThing Social</span>
+            <span>• Next-Gen Platform</span>
           </div>
-          <div className="group cursor-default">
-            <h3 className="text-4xl lg:text-5xl font-bold mb-1 group-hover:text-primary-pink transition-colors duration-300">
-              800+
-            </h3>
-            <p className="text-xs text-gray-500 uppercase tracking-widest">Happy Customers</p>
+          <div className="flex items-center gap-6">
+            <span className="hover:text-zinc-300 cursor-pointer">Privacy</span>
+            <span className="hover:text-zinc-300 cursor-pointer">Terms</span>
+            <span className="hover:text-zinc-300 cursor-pointer">Community</span>
+            <span className="hover:text-zinc-300 cursor-pointer">Support</span>
           </div>
+          <p>© 2026 AnyThing Platform. All rights reserved.</p>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

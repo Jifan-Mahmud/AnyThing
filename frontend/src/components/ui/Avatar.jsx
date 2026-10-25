@@ -8,21 +8,34 @@ const Avatar = ({ src, alt, size = 'md', hasStory = false, isOnline = false, cla
     xl: 'w-20 h-20',
   };
 
+  const currentSize = sizeClasses[size] || sizeClasses.md;
+
   return (
-    <div className={`relative inline-block ${className}`}>
-      <div
-        className={`rounded-full overflow-hidden ${sizeClasses[size] || sizeClasses.md} ${
-          hasStory ? 'ring-2 ring-primary-pink ring-offset-2 ring-offset-bg-darker p-[2px]' : ''
-        }`}
-      >
-        <img
-          src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'}
-          alt={alt || 'Avatar'}
-          className="w-full h-full object-cover rounded-full"
-        />
-      </div>
+    <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
+      {hasStory ? (
+        <div className={`rounded-full bg-gradient-to-tr from-primary-pink via-purple-500 to-amber-400 p-[2.5px] shadow-sm shadow-primary-pink/20`}>
+          <div className={`rounded-full overflow-hidden ${currentSize} ring-2 ring-bg-darker`}>
+            <img
+              src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'}
+              alt={alt || 'Avatar'}
+              className="w-full h-full object-cover rounded-full bg-surface"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className={`rounded-full overflow-hidden ${currentSize} border border-white/10 bg-surface`}>
+          <img
+            src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'}
+            alt={alt || 'Avatar'}
+            className="w-full h-full object-cover rounded-full"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       {isOnline && (
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-bg-darker rounded-full"></span>
+        <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-bg-darker rounded-full ring-1 ring-emerald-400/50" />
       )}
     </div>
   );

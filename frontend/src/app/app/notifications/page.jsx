@@ -10,8 +10,9 @@ import {
   BookImage,
   Phone,
   Video,
-  Loader2,
+  Bell,
   Trash2,
+  Sparkles,
 } from 'lucide-react';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
@@ -30,26 +31,26 @@ const timeAgo = (date) => {
 };
 
 const NotifIcon = ({ type }) => {
-  const base = 'w-5 h-5';
+  const base = 'w-4 h-4';
   switch (type) {
     case 'like':
-      return <Heart className={`${base} text-red-400`} fill="currentColor" />;
+      return <Heart className={`${base} text-rose-400`} fill="currentColor" />;
     case 'follow':
       return <UserPlus className={`${base} text-blue-400`} />;
     case 'comment':
-      return <ImageIcon className={`${base} text-yellow-400`} />;
+      return <ImageIcon className={`${base} text-amber-400`} />;
     case 'post':
       return <ImageIcon className={`${base} text-primary-pink`} />;
     case 'reel':
       return <Film className={`${base} text-purple-400`} />;
     case 'story':
-      return <BookImage className={`${base} text-green-400`} />;
+      return <BookImage className={`${base} text-emerald-400`} />;
     case 'audio_call':
       return <Phone className={`${base} text-emerald-400`} />;
     case 'video_call':
       return <Video className={`${base} text-sky-400`} />;
     default:
-      return <Bell className={`${base} text-gray-400`} />;
+      return <Bell className={`${base} text-zinc-400`} />;
   }
 };
 
@@ -158,7 +159,7 @@ export default function NotificationsPage() {
       headers,
       credentials: 'include',
     });
-    setNotifications((prev) => (prev.map((n) => (n._id === id ? { ...n, read: true } : n))));
+    setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, read: true } : n)));
     setUnreadCount((prev) => Math.max(0, prev - 1));
   };
 
@@ -200,12 +201,12 @@ export default function NotificationsPage() {
   const renderGroup = (label, items) => {
     if (!items.length) return null;
     return (
-      <div key={label}>
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 flex items-center gap-3">
-          {label}
+      <div key={label} className="space-y-3">
+        <h2 className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-3">
+          <span>{label}</span>
           <div className="flex-1 h-px bg-white/5" />
         </h2>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {items.map((notif) => {
             const sender = notif.sender;
             const isFollowType = notif.type === 'follow';
@@ -216,11 +217,15 @@ export default function NotificationsPage() {
                 key={notif._id}
                 whileHover={{ scale: 1.01, x: 2 }}
                 onClick={() => handleNotifClick(notif)}
-                className={`flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-colors duration-200 hover:bg-white/5 ${
-                  !notif.read ? 'bg-primary-pink/5 border border-primary-pink/15' : ''
+                className={`flex items-center gap-3.5 p-3 sm:p-4 rounded-2xl cursor-pointer transition-all border ${
+                  !notif.read
+                    ? 'bg-primary-pink/10 border-primary-pink/25 shadow-sm shadow-primary-pink/10'
+                    : 'glass-panel border-white/5 hover:border-white/10'
                 }`}
               >
-                {!notif.read && <div className="w-2 h-2 rounded-full bg-primary-pink shrink-0" />}
+                {!notif.read && (
+                  <div className="w-2 h-2 rounded-full bg-primary-pink shadow-neon-pink shrink-0" />
+                )}
 
                 <div className="relative shrink-0">
                   <img
@@ -229,23 +234,23 @@ export default function NotificationsPage() {
                       `https://api.dicebear.com/7.x/avataaars/svg?seed=${sender?.username}`
                     }
                     alt={sender?.username}
-                    className="w-12 h-12 rounded-full object-cover border border-white/10 bg-surface"
+                    className="w-11 h-11 rounded-full object-cover border border-white/10 bg-surface"
                   />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-bg-darker rounded-full flex items-center justify-center border border-white/10">
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-bg-darker rounded-full flex items-center justify-center border border-white/10 shadow-md">
                     <NotifIcon type={notif.type} />
                   </div>
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white leading-snug">
+                  <p className="text-xs sm:text-sm text-white leading-relaxed">
                     <span className="font-bold hover:text-primary-pink transition-colors">
                       {sender?.username}
                     </span>{' '}
-                    <span className="text-gray-400 font-medium">
+                    <span className="text-zinc-300 font-medium">
                       {notifText(notif.type, '').replace(sender?.username, '').trim()}
                     </span>
                   </p>
-                  <span className="text-[11px] text-gray-600 font-semibold">
+                  <span className="text-[10px] text-zinc-500 font-semibold mt-0.5 block">
                     {timeAgo(notif.createdAt)}
                   </span>
                 </div>
@@ -257,10 +262,10 @@ export default function NotificationsPage() {
                       e.stopPropagation();
                       handleFollowBack(sender?._id);
                     }}
-                    className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                       isFollowing
-                        ? 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
-                        : 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-lg shadow-primary-pink/20'
+                        ? 'bg-white/5 border border-white/10 text-zinc-400 hover:text-white'
+                        : 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-md shadow-primary-pink/25'
                     }`}
                   >
                     {isFollowing ? 'Following' : 'Follow Back'}
@@ -269,7 +274,7 @@ export default function NotificationsPage() {
                   <img
                     src={notif.imageUrl || notif.refPost?.imageUrl || notif.refStory?.mediaUrl}
                     alt=""
-                    className="w-12 h-12 rounded-xl object-cover shrink-0 border border-white/10"
+                    className="w-11 h-11 rounded-xl object-cover shrink-0 border border-white/10"
                   />
                 ) : null}
               </motion.div>
@@ -281,15 +286,17 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-2xl mx-auto px-4 py-8 md:px-8">
+    <div className="flex flex-col h-full w-full max-w-2xl mx-auto px-4 py-6 md:py-8 sm:px-6 md:px-8">
+      {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-black italic tracking-tighter text-white">
-            Notifi<span className="text-primary-pink">cations</span>
+          <h1 className="text-2xl sm:text-3xl font-black italic tracking-tight text-white flex items-center gap-2">
+            <span>Notifi<span className="text-primary-pink text-glow">cations</span></span>
+            <Sparkles className="w-4 h-4 text-primary-pink" />
           </h1>
           {unreadCount > 0 && (
-            <p className="text-xs text-gray-500 mt-1">
-              <span className="text-primary-pink font-bold">{unreadCount}</span> unread
+            <p className="text-xs text-zinc-400 mt-1 font-medium">
+              <span className="text-primary-pink font-bold">{unreadCount}</span> new unread
             </p>
           )}
         </div>
@@ -297,7 +304,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="text-xs font-bold uppercase tracking-widest text-primary-pink hover:text-white transition-colors"
+              className="text-xs font-bold text-primary-pink hover:text-primary-pink-hover transition-colors cursor-pointer"
             >
               Mark all read
             </button>
@@ -305,7 +312,7 @@ export default function NotificationsPage() {
           {notifications.length > 0 && (
             <button
               onClick={handleClearAll}
-              className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-red-400"
+              className="p-2 hover:bg-white/5 rounded-full transition-colors text-zinc-500 hover:text-rose-400 cursor-pointer"
               title="Clear all"
             >
               <Trash2 size={16} />
@@ -323,15 +330,15 @@ export default function NotificationsPage() {
           />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Bell size={52} className="text-gray-700 mb-4" />
-          <h3 className="text-lg font-bold text-gray-500">No notifications yet</h3>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="glass-panel rounded-3xl p-12 text-center border border-white/5 my-12">
+          <Bell size={48} className="text-zinc-600 mb-3 mx-auto" />
+          <h3 className="text-base font-bold text-white mb-1">No notifications yet</h3>
+          <p className="text-xs text-zinc-400 max-w-xs mx-auto">
             When someone follows you or interacts with your posts, you will see it here.
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {renderGroup('Today', today)}
           {renderGroup('This Week', thisWeek)}
           {renderGroup('Earlier', earlier)}

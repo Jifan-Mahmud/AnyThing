@@ -6,9 +6,9 @@ import {
   Grid,
   Bookmark,
   UserPlus,
-  ArrowLeft,
-  Loader2,
   Image as ImageIcon,
+  Sparkles,
+  Share2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Avatar from '../../../components/ui/Avatar';
@@ -16,6 +16,7 @@ import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
 import EditProfileModal from '../../../components/profile/EditProfileModal';
 import { motion } from 'motion/react';
+import { toast } from 'react-toastify';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -24,8 +25,8 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('posts');
 
   const fetchProfileAndPosts = async () => {
     setLoading(true);
@@ -69,6 +70,13 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  const handleShareProfile = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Profile URL copied to clipboard!');
+    }
+  };
+
   if (loading && !profileData) {
     return (
       <div className="flex h-full w-full items-center justify-center p-12">
@@ -82,127 +90,154 @@ export default function ProfilePage() {
   }
 
   const displayUser = profileData || {
-    username: user?.username || 'loading',
-    name: user?.name || user?.username || 'User Profile',
+    username: user?.username || 'creator',
+    name: user?.name || user?.username || 'Creator Profile',
     bio: '',
     avatarUrl: user?.avatarUrl || '',
     posts: 0,
-    followers: 0,
-    following: 0,
+    followerCount: 0,
+    followingCount: 0,
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 py-6 md:py-8 md:px-8">
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row md:gap-8 mb-8 md:mb-12">
-        {/* Mobile: Avatar and Stats side by side */}
-        <div className="flex items-center gap-6 md:gap-8 mb-4 md:mb-0">
-          <div className="flex-shrink-0">
-            <Avatar
-              src={
-                displayUser.avatarUrl ||
-                'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder'
-              }
-              size="xl"
-              className="border-4 border-surface w-20 h-20 md:w-32 md:h-32 shadow-xl"
-            />
-          </div>
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10">
+      {/* Profile Header Glass Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-panel rounded-3xl sm:rounded-[32px] p-6 sm:p-8 border border-white/5 shadow-2xl mb-8 relative overflow-hidden"
+      >
+        <div className="flex flex-col md:flex-row md:items-center gap-6 sm:gap-8">
+          {/* Avatar with Glow Ring */}
+          <div className="flex items-center gap-6 sm:gap-8">
+            <div className="relative shrink-0">
+              <Avatar
+                src={
+                  displayUser.avatarUrl ||
+                  'https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder'
+                }
+                size="xl"
+                hasStory={true}
+                className="w-20 h-20 sm:w-28 sm:h-28"
+              />
+            </div>
 
-          {/* Stats (Mobile only view) */}
-          <div className="flex flex-1 justify-around text-center md:hidden">
-            <div className="flex flex-col">
-              <span className="font-bold text-lg">{posts.length}</span>
-              <span className="text-gray-400 text-xs">posts</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-lg">{displayUser.followerCount || 0}</span>
-              <span className="text-gray-400 text-xs">followers</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-lg">{displayUser.followingCount || 0}</span>
-              <span className="text-gray-400 text-xs">following</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col w-full">
-          {/* Header Actions */}
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
-            <h1 className="text-xl md:text-2xl font-bold">@{displayUser.username}</h1>
-            <div className="flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setIsEditOpen(true)}
-                className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-xl font-semibold text-sm hover:bg-surface transition-colors"
-              >
-                Edit Profile
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 md:flex-none px-4 py-1.5 bg-surface-light text-white rounded-xl font-semibold text-sm hover:bg-surface transition-colors"
-              >
-                Share Profile
-              </motion.button>
-              <button className="p-2 bg-surface-light text-white rounded-xl hover:bg-surface transition-colors">
-                <Settings size={20} />
-              </button>
+            {/* Mobile Stats */}
+            <div className="flex flex-1 justify-around text-center md:hidden">
+              <div>
+                <span className="font-black text-lg text-white">{posts.length}</span>
+                <p className="text-[11px] text-zinc-400 font-medium">Posts</p>
+              </div>
+              <div>
+                <span className="font-black text-lg text-white">{displayUser.followerCount || 0}</span>
+                <p className="text-[11px] text-zinc-400 font-medium">Followers</p>
+              </div>
+              <div>
+                <span className="font-black text-lg text-white">{displayUser.followingCount || 0}</span>
+                <p className="text-[11px] text-zinc-400 font-medium">Following</p>
+              </div>
             </div>
           </div>
 
-          {/* Stats (Desktop only view) */}
-          <div className="hidden md:flex gap-10 mb-6 text-sm md:text-base">
-            <div>
-              <span className="font-bold text-white">{posts.length}</span>{' '}
-              <span className="text-gray-400">posts</span>
-            </div>
-            <div className="cursor-pointer">
-              <span className="font-bold text-white">{displayUser.followerCount || 0}</span>{' '}
-              <span className="text-gray-400">followers</span>
-            </div>
-            <div className="cursor-pointer">
-              <span className="font-bold text-white">{displayUser.followingCount || 0}</span>{' '}
-              <span className="text-gray-400">following</span>
-            </div>
-          </div>
+          {/* Details & Actions */}
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                  <span>@{displayUser.username}</span>
+                  <Sparkles className="w-4 h-4 text-primary-pink" />
+                </h1>
+                <p className="text-xs font-semibold text-zinc-400 mt-0.5">
+                  {displayUser.name || displayUser.username}
+                </p>
+              </div>
 
-          {/* Bio */}
-          <div className="text-sm md:text-base">
-            <h2 className="font-bold text-white">{displayUser.name || displayUser.username}</h2>
-            <p className="whitespace-pre-line text-gray-300 mt-1">
-              {displayUser.bio || 'No bio yet.'}
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setIsEditOpen(true)}
+                  className="px-4 py-2 bg-primary-pink hover:bg-primary-pink-hover text-white rounded-xl font-bold text-xs shadow-md shadow-primary-pink/20 transition-all cursor-pointer"
+                >
+                  Edit Profile
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleShareProfile}
+                  className="px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold text-xs border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Share2 size={14} />
+                  <span>Share</span>
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Desktop Stats */}
+            <div className="hidden md:flex gap-8 my-3 text-sm">
+              <div>
+                <span className="font-black text-white">{posts.length}</span>{' '}
+                <span className="text-zinc-400 font-medium">posts</span>
+              </div>
+              <div>
+                <span className="font-black text-white">{displayUser.followerCount || 0}</span>{' '}
+                <span className="text-zinc-400 font-medium">followers</span>
+              </div>
+              <div>
+                <span className="font-black text-white">{displayUser.followingCount || 0}</span>{' '}
+                <span className="text-zinc-400 font-medium">following</span>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <p className="text-xs sm:text-sm text-zinc-300 whitespace-pre-line leading-relaxed mt-1">
+              {displayUser.bio || 'Digital creator on AnyThing. Building ideas and inspiring connections.'}
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Tabs */}
-      <div className="flex justify-around md:justify-center border-t border-white/10 mb-1 md:mb-6">
-        <div className="flex w-full md:w-auto md:gap-12 justify-around">
-          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-primary-pink text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <Grid size={22} className="md:w-4 md:h-4" />{' '}
-            <span className="hidden md:inline">Posts</span>
-          </button>
-          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <Bookmark size={22} className="md:w-4 md:h-4" />{' '}
-            <span className="hidden md:inline">Saved</span>
-          </button>
-          <button className="flex-1 md:flex-none flex justify-center items-center gap-2 py-3 md:py-4 border-t-2 border-transparent text-gray-400 hover:text-white font-semibold text-xs tracking-widest uppercase transition-colors">
-            <UserPlus size={22} className="md:w-4 md:h-4" />{' '}
-            <span className="hidden md:inline">Tagged</span>
-          </button>
+      <div className="flex justify-center border-b border-white/5 mb-6">
+        <div className="flex gap-8">
+          {[
+            { id: 'posts', label: 'Posts', icon: Grid },
+            { id: 'saved', label: 'Saved', icon: Bookmark },
+            { id: 'tagged', label: 'Tagged', icon: UserPlus },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex items-center gap-2 py-3 px-2 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                  isActive ? 'text-primary-pink' : 'text-zinc-500 hover:text-white'
+                }`}
+              >
+                <Icon size={16} />
+                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeProfileTab"
+                    className="absolute bottom-0 inset-x-0 h-0.5 bg-primary-pink shadow-neon-pink"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Posts Grid */}
       {posts.length > 0 ? (
-        <div className="grid grid-cols-3 gap-1 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
           {posts.map((post) => (
             <motion.div
               key={post._id}
               whileHover={{ scale: 1.02 }}
-              className="relative aspect-square group cursor-pointer bg-surface overflow-hidden rounded-xl md:rounded-2xl shadow-md"
+              className="relative aspect-square group cursor-pointer bg-surface overflow-hidden rounded-2xl border border-white/5 shadow-md"
             >
               {post.type === 'reel' ? (
                 <video
@@ -222,20 +257,22 @@ export default function ProfilePage() {
                   src={post.imageUrl}
                   alt="Post"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
                 />
               )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300">
-                <div className="flex items-center gap-2 text-white font-bold">
-                  <span className="text-xl text-primary-pink">♥</span> {post.likeCount || 0}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-4 transition-opacity duration-300">
+                <div className="flex items-center gap-1.5 text-white font-bold text-xs sm:text-sm">
+                  <span className="text-primary-pink">♥</span> {post.likeCount || 0}
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-          <ImageIcon size={48} className="mb-3 text-gray-600" />
-          <p className="text-sm font-semibold">No Posts Yet</p>
+        <div className="glass-panel rounded-3xl p-12 text-center border border-white/5 my-8">
+          <ImageIcon size={44} className="mx-auto mb-3 text-zinc-600" />
+          <h4 className="font-bold text-base text-white mb-1">No Posts Yet</h4>
+          <p className="text-xs text-zinc-400">Posts you share will appear on your profile grid.</p>
         </div>
       )}
 

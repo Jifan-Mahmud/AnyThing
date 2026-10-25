@@ -1,8 +1,13 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import ClientProviders from '../components/providers/ClientProviders';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-jakarta',
+  weight: ['300', '400', '500', '600', '700', '800'],
+});
 
 export const metadata = {
   title: 'AnyThing - Connect, Share & Express Yourself',
@@ -12,7 +17,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-bg-darker text-white antialiased min-h-screen`}>
+      <body className={`${jakarta.variable} ${jakarta.className} bg-bg-darker text-white antialiased min-h-screen selection:bg-primary-pink selection:text-white`}>
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

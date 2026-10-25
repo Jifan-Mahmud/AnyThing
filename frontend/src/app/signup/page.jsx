@@ -3,11 +3,21 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, User, Globe, MessageSquare, Code, ChevronLeft, ArrowRight, Camera, Loader2 } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  User,
+  ChevronLeft,
+  ArrowRight,
+  Camera,
+  Loader2,
+  Eye,
+  EyeOff,
+  Zap,
+  Sparkles,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'motion/react';
-
-const EMOJIS = ['🚀', '✨', '🔥', '💖', '👋', '🎉', '🎈', '🍭', '🌈', '🎸', '🕹️', '📱'];
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,9 +26,11 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [bio, setBio] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -30,76 +42,97 @@ export default function SignupPage() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
     const result = await signup(name, email, password, avatarFile, bio);
     setLoading(false);
     if (result.success) {
       router.replace('/app');
+    } else {
+      setErrorMsg(result.message || 'Failed to create account. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg-dark font-sans text-white relative overflow-hidden flex items-center justify-center p-4">
-      {/* Floating Emojis Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-100">
-        {EMOJIS.map((emoji, idx) => (
-          <div
-            key={idx}
-            className="absolute animate-fly-up opacity-0"
-            style={{
-              left: `${(idx * 8.3) % 100}%`,
-              animationDuration: `${12 + (idx % 4) * 3}s`,
-              animationDelay: `${(idx % 3) * 1.5}s`,
-              fontSize: `${1.5 + (idx % 2) * 0.5}rem`,
-            }}
-          >
-            {emoji}
-          </div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-bg-darker font-sans text-white relative overflow-hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      {/* Ambient Aurora Glows */}
+      <div
+        className="aurora-bg w-[550px] h-[550px] bg-primary-pink/15 -top-20 -right-20"
+        style={{ animationDuration: '16s' }}
+      />
+      <div
+        className="aurora-bg w-[450px] h-[450px] bg-purple-600/15 -bottom-20 -left-20"
+        style={{ animationDuration: '20s', animationDelay: '-5s' }}
+      />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-8 flex items-center gap-2 text-white/40 hover:text-primary-pink transition-colors font-bold group"
-        >
-          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          Back
-        </button>
-
-        {/* Form Card */}
+        {/* Top Back Navigation */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="bg-surface/40 border border-white/10 backdrop-blur-2xl rounded-[40px] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-6 flex items-center justify-between"
         >
-          {/* Decorative Pink Glow */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary-pink/20 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary-pink/10 rounded-full blur-[100px]" />
+          <button
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition-colors group"
+          >
+            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </button>
 
-          <div className="text-center mb-8 relative z-10">
-            <h1 className="text-4xl font-black italic tracking-tighter mb-2">
-              Any<span className="text-primary-pink drop-shadow-[0_0_10px_rgba(255,182,193,0.5)]">Thing</span>
+          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-400">
+            <Sparkles className="w-3 h-3 text-primary-pink" />
+            <span>Join 150K+ Creators</span>
+          </div>
+        </motion.div>
+
+        {/* Auth Glass Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="glass-panel border border-white/10 rounded-3xl sm:rounded-[36px] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
+        >
+          {/* Header & Logo */}
+          <div className="text-center mb-6">
+            <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-pink to-purple-600 items-center justify-center shadow-lg shadow-primary-pink/25 mb-4">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black italic tracking-tight">
+              Any<span className="text-primary-pink text-glow">Thing</span>
             </h1>
-            <p className="text-white/40 font-medium">Create your account to start evolving.</p>
+            <p className="text-xs sm:text-sm text-zinc-400 mt-2 font-medium">
+              Join the new era of creator community & realtime social.
+            </p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-4 relative z-10">
+          {/* Error Message */}
+          {errorMsg && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold text-center"
+            >
+              {errorMsg}
+            </motion.div>
+          )}
+
+          {/* Signup Form */}
+          <form onSubmit={handleSignup} className="space-y-4">
             {/* Avatar Upload */}
-            <div className="flex flex-col items-center gap-2 mb-4">
+            <div className="flex flex-col items-center gap-2 mb-2">
               <div className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-primary-pink/50 hover:border-primary-pink shadow-lg transition-colors">
                 <img
-                  src={avatarPreview || 'https://api.dicebear.com/7.x/avataaars/svg?seed=signup'}
+                  src={avatarPreview || 'https://api.dicebear.com/7.x/avataaars/svg?seed=newuser'}
                   alt="Avatar Preview"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <label
                   htmlFor="signup-avatar-input"
-                  className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                  className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
                 >
-                  <Camera size={20} className="text-white" />
+                  <Camera size={20} className="text-white mb-0.5" />
+                  <span className="text-[9px] font-bold text-white uppercase">Upload</span>
                 </label>
                 <input
                   id="signup-avatar-input"
@@ -111,66 +144,91 @@ export default function SignupPage() {
                 />
               </div>
               <span
-                className="text-[11px] font-bold text-primary-pink cursor-pointer"
+                className="text-[11px] font-bold text-primary-pink cursor-pointer hover:underline"
                 onClick={() => document.getElementById('signup-avatar-input')?.click()}
               >
-                Add Profile Photo
+                Choose Profile Photo
               </span>
             </div>
 
-            <div className="relative group">
-              <User
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-pink transition-colors"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Full Name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm"
-              />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-zinc-300">
+                Full Name / Username
+              </label>
+              <div className="relative group">
+                <User
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-pink transition-colors"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="e.g. John Doe"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium"
+                />
+              </div>
             </div>
 
-            <div className="relative group">
-              <Mail
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-primary-pink transition-colors"
-                size={20}
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm"
-              />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-zinc-300">
+                Email Address
+              </label>
+              <div className="relative group">
+                <Mail
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-pink transition-colors"
+                  size={18}
+                />
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium"
+                />
+              </div>
             </div>
 
-            <div className="relative group">
-              <Lock
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-primary-pink transition-colors"
-                size={20}
-              />
-              <input
-                type="password"
-                placeholder="Create Password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm"
-              />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-zinc-300">
+                Password
+              </label>
+              <div className="relative group">
+                <Lock
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-pink transition-colors"
+                  size={18}
+                />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Minimum 6 characters"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-11 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
-            <div className="relative group">
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-zinc-300">
+                Short Bio (Optional)
+              </label>
               <textarea
-                placeholder="Tell us about yourself (Bio)..."
+                placeholder="What excites you about creating?"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={2}
                 maxLength={150}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-pink/30 transition-all placeholder:text-white/20 font-medium text-sm resize-none"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-4 text-sm text-white focus:outline-none focus:border-primary-pink focus:ring-2 focus:ring-primary-pink/20 transition-all placeholder:text-zinc-500 font-medium resize-none"
                 disabled={loading}
               />
             </div>
@@ -180,52 +238,34 @@ export default function SignupPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-pink text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all shadow-xl shadow-primary-pink/20 mt-6 flex items-center justify-center gap-2 group disabled:opacity-50"
+              className="w-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold py-3.5 rounded-2xl transition-all shadow-xl shadow-primary-pink/25 mt-4 flex items-center justify-center gap-2 group disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="animate-spin" size={20} />
-                  Signing Up...
+                  <Loader2 className="animate-spin" size={18} />
+                  <span className="text-sm">Creating Account...</span>
                 </>
               ) : (
                 <>
-                  Sign Up
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  <span className="text-sm">Create Free Account</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </motion.button>
           </form>
 
-          <div className="relative flex items-center justify-center my-8 z-10">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5"></div>
-            </div>
-            <span className="relative px-4 bg-transparent text-[10px] text-white/20 uppercase tracking-widest font-bold">
-              Or sign up with
-            </span>
+          {/* Bottom Switcher */}
+          <div className="mt-6 pt-5 border-t border-white/5 text-center">
+            <p className="text-xs text-zinc-400 font-medium">
+              Already have an account?{' '}
+              <Link
+                href="/login"
+                className="text-primary-pink font-bold hover:underline underline-offset-4 ml-1"
+              >
+                Sign In
+              </Link>
+            </p>
           </div>
-
-          <div className="flex gap-4 relative z-10">
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <Globe size={20} />
-            </button>
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <MessageSquare size={20} />
-            </button>
-            <button className="flex-1 bg-white/5 border border-white/10 py-3 rounded-2xl flex items-center justify-center text-white hover:bg-primary-pink/10 hover:border-primary-pink/30 transition-colors shadow-sm">
-              <Code size={20} />
-            </button>
-          </div>
-
-          <p className="text-center text-sm text-white/40 mt-8 font-medium relative z-10">
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              className="text-primary-pink font-black hover:underline underline-offset-4"
-            >
-              Log In
-            </Link>
-          </p>
         </motion.div>
       </div>
     </div>
