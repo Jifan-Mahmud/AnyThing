@@ -7,10 +7,26 @@ import socketHandler from "./socket.js";
 
 const PORT = process.env.PORT || 5000;
 const httpServer = createServer(app);
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://any-thing-three.vercel.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+].filter(Boolean);
+
 const io = new Server(httpServer, {
   cors: {
-    origin: [process.env.FRONTEND_URL || "http://localhost:5173", "http://localhost:5174"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 

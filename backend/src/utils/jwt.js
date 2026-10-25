@@ -1,10 +1,13 @@
 import { SignJWT, jwtVerify } from "jose-cjs";
 
 const getSecret = () => {
-  const secret =
-    process.env.JWT_SECRET ||
-    process.env.BETTER_AUTH_SECRET ||
-    "anything-super-secure-jwt-secret-key-32chars";
+  const secret = process.env.JWT_SECRET || process.env.BETTER_AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Security Error: JWT_SECRET or BETTER_AUTH_SECRET must be set in production environment!");
+    }
+    return new TextEncoder().encode("dev-secret-only-change-in-production-env");
+  }
   return new TextEncoder().encode(secret);
 };
 
