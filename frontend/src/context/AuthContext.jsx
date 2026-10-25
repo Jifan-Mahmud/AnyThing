@@ -172,6 +172,74 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Sign in with Google Credential (from Google Identity Services / One-Tap / Popup)
+  const signInWithGoogleCredential = async (credential) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential }),
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Google authentication failed');
+      }
+
+      if (data.data?.token && typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', data.data.token);
+      }
+      setUser(data.data.user);
+      toast.success('Welcome back with Google! 🎉');
+      return { success: true, user: data.data.user };
+    } catch (err) {
+      toast.error(err.message || 'Google sign-in failed');
+      return { success: false, error: err.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sign in with Google (OAuth Redirect via better-auth)
+  const signInWithGoogle = async () => {
+    try {
+      const callbackURL =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/app`
+          : '/app';
+
+      const res = await fetch(`${API_BASE}/auth/sign-in/social`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'google',
+          callbackURL,
+        }),
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        const errorMsg =
+          data.error?.message || data.message || 'Failed to start Google sign-in';
+        throw new Error(errorMsg);
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return { success: true, redirect: true };
+      }
+
+      await checkSession();
+      return { success: true };
+    } catch (err) {
+      toast.error(err.message || 'Google sign-in failed');
+      return { success: false, error: err.message };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -179,6 +247,9 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         signup,
+        signInWithGoogle,
+        signInWithGoogleCredential,
+        loginWithGoogle: signInWithGoogle,
         logout,
         updateProfile,
         checkSession,

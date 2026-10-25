@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BrandLogo from '../../components/ui/BrandLogo';
+import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
 import {
   Mail,
   Lock,
@@ -99,6 +100,17 @@ export default function SignupPage() {
             <p className="text-xs sm:text-sm text-zinc-400 font-medium">
               Join the new era of creator community & realtime social.
             </p>
+          </div>
+
+          {/* Google Auth Button */}
+          <div className="mb-6">
+            <GoogleAuthButton text="Sign up with Google" />
+            <div className="relative mt-6 flex items-center justify-center">
+              <div className="border-t border-white/10 w-full" />
+              <span className="bg-[#101216] px-3 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider absolute">
+                or sign up with email
+              </span>
+            </div>
           </div>
 
           {/* Error Message */}

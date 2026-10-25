@@ -5,7 +5,7 @@ import { toNodeHandler } from "better-auth/node";
 // ── Rate limiter for auth endpoints ──────────────────────────────────────────
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20,                   // max 20 auth requests per window per IP
+  max: 100,                  // max 100 auth requests per window per IP
   standardHeaders: true,
   legacyHeaders: false,
   message: {

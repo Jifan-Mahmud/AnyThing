@@ -5,8 +5,8 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// ── Route imports ─────────────────────────────────────────────────────────────
 import { authHandler, authLimiter } from "./src/routes/auth.routes.js";
+import { googleSignIn } from "./src/controllers/auth.controller.js";
 import userRoutes from "./src/routes/user.routes.js";
 import followRoutes from "./src/routes/follow.routes.js";
 import postRoutes from "./src/routes/post.routes.js";
@@ -25,13 +25,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-// Must allow credentials because better-auth uses cookies for sessions.
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://any-thing-three.vercel.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true, // required for cookie-based auth
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   })
 );
 
@@ -57,13 +70,15 @@ app.use((req, _res, next) => {
 });
 
 // ── Routes ────────────────────────────────────────────────────────────────────
+// Google ID token sign-in (GIS / popup / one-tap)
+app.post("/api/auth/google", googleSignIn);
+
 // Auth: better-auth handles /api/auth/* internally.
 // toNodeHandler bypasses Express middleware, so we handle CORS + preflight
 // in a single app.all before delegating to better-auth.
-const FRONTEND = process.env.FRONTEND_URL || "http://localhost:5173";
-
 app.all("/api/auth/*", authLimiter, (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", FRONTEND);
+  const reqOrigin = req.headers.origin || process.env.FRONTEND_URL || "https://any-thing-three.vercel.app";
+  res.header("Access-Control-Allow-Origin", reqOrigin);
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BrandLogo from '../../components/ui/BrandLogo';
+import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
 import {
   Mail,
   Lock,
@@ -80,11 +81,22 @@ export default function LoginPage() {
           className="glass-panel border border-white/10 rounded-3xl sm:rounded-[36px] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
         >
           {/* Header & Typographic Logo */}
-          <div className="text-center mb-8 flex flex-col items-center">
+          <div className="text-center mb-6 flex flex-col items-center">
             <BrandLogo size="lg" className="mb-2" onClick={() => router.push('/')} />
             <p className="text-xs sm:text-sm text-zinc-400 font-medium">
               Welcome back! Step into your creative sphere.
             </p>
+          </div>
+
+          {/* Google Auth Button */}
+          <div className="mb-6">
+            <GoogleAuthButton text="Continue with Google" />
+            <div className="relative mt-6 flex items-center justify-center">
+              <div className="border-t border-white/10 w-full" />
+              <span className="bg-[#101216] px-3 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider absolute">
+                or sign in with email
+              </span>
+            </div>
           </div>
 
           {/* Error Message */}
