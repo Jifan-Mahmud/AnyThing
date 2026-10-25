@@ -212,15 +212,15 @@ export default function FeedPage() {
     <div className="glass-panel rounded-3xl p-4 sm:p-5 my-6 border border-white/5 shadow-xl sm:max-w-xl md:max-w-2xl mx-auto w-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary-pink animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-[#ffa07a] animate-pulse" />
           <h3 className="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
             <span>Trending Reels</span>
-            <Sparkles className="w-3.5 h-3.5 text-primary-pink" />
+            <Sparkles className="w-3.5 h-3.5 text-soft-peach" />
           </h3>
         </div>
         <button
           onClick={() => router.push('/app/reels')}
-          className="text-xs font-bold text-primary-pink hover:text-primary-pink-hover transition-colors flex items-center gap-1"
+          className="text-xs font-bold text-soft-peach hover:text-white transition-colors flex items-center gap-1"
         >
           Watch All
         </button>
@@ -354,7 +354,7 @@ export default function FeedPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleFollowUser(u._id)}
-                  className="text-xs font-bold px-3 py-1.5 rounded-full bg-primary-pink/10 hover:bg-primary-pink text-primary-pink hover:text-white transition-all shrink-0 cursor-pointer"
+                  className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] text-white hover:opacity-90 shadow-sm shadow-[#ff2e83]/20 transition-all shrink-0 cursor-pointer"
                 >
                   Follow
                 </motion.button>

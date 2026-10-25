@@ -9,7 +9,6 @@ export default function LoadingSpinner({
   subtext = '',
   className = '',
 }) {
-  // Dimension mappings
   const dimensions = {
     sm: {
       outer: 'w-7 h-7',
@@ -56,14 +55,14 @@ export default function LoadingSpinner({
     <div className={`flex flex-col items-center justify-center gap-4 ${className}`}>
       {/* Visual Ambient Glow & Spinner Body */}
       <div className="relative flex items-center justify-center">
-        {/* Soft Pink Ambient Glow */}
+        {/* Soft Sunset Glow */}
         <div
-          className={`absolute rounded-full bg-primary-pink/20 blur-2xl pointer-events-none animate-pulse ${dimensions.glow}`}
+          className={`absolute rounded-full bg-gradient-to-tr from-[#ff2e83]/20 to-[#ffa07a]/20 blur-2xl pointer-events-none animate-pulse ${dimensions.glow}`}
         />
 
         {/* Outer Gradient Spinner Ring */}
         <div
-          className={`relative rounded-full p-[2.5px] bg-gradient-to-tr from-primary-pink via-[#ff1493] to-purple-500/20 animate-spin ${dimensions.outer}`}
+          className={`relative rounded-full p-[2.5px] bg-gradient-to-tr from-[#ff2e83] via-[#ff4b98] to-[#ffa07a] animate-spin ${dimensions.outer}`}
           style={{ animationDuration: '1.2s' }}
         >
           {/* Inner cutout to form a glowing ring */}
@@ -72,17 +71,17 @@ export default function LoadingSpinner({
 
         {/* Inner Counter-Rotating Accent Ring */}
         <div
-          className={`absolute rounded-full border-2 border-transparent border-t-white/80 border-b-primary-pink/80 animate-spin ${dimensions.inner}`}
+          className={`absolute rounded-full border-2 border-transparent border-t-white/80 border-b-[#ffa07a]/80 animate-spin ${dimensions.inner}`}
           style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}
         />
 
         {/* Pulsating Center Core */}
         <div
-          className={`absolute rounded-full bg-gradient-to-r from-primary-pink to-[#ff1493] shadow-[0_0_12px_rgba(255,105,180,0.9)] animate-ping ${dimensions.core}`}
+          className={`absolute rounded-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] shadow-[0_0_12px_rgba(255,46,131,0.9)] animate-ping ${dimensions.core}`}
           style={{ animationDuration: '1.8s' }}
         />
         <div
-          className={`absolute rounded-full bg-primary-pink shadow-[0_0_8px_rgba(255,105,180,1)] ${dimensions.core}`}
+          className={`absolute rounded-full bg-[#ff2e83] shadow-[0_0_8px_rgba(255,46,131,1)] ${dimensions.core}`}
         />
       </div>
 
@@ -90,19 +89,20 @@ export default function LoadingSpinner({
       {(text || fullScreen) && (
         <div className="flex flex-col items-center text-center space-y-1 z-10">
           {fullScreen && (
-            <div className={`font-black italic tracking-tighter text-white ${dimensions.logoSize} drop-shadow-[0_0_15px_rgba(255,105,180,0.5)]`}>
-              Any<span className="text-primary-pink">Thing</span>
+            <div className={`font-black italic tracking-tighter text-white ${dimensions.logoSize} flex items-center`}>
+              Any<span className="bg-gradient-to-r from-[#ff2e83] via-[#ff4b98] to-[#ffa07a] bg-clip-text text-transparent">Thing</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ffa07a] ml-1 mb-1.5 animate-pulse" />
             </div>
           )}
 
           {text && (
-            <p className={`font-semibold tracking-wide text-gray-200 ${dimensions.fontSize}`}>
+            <p className={`font-semibold tracking-wide text-zinc-200 ${dimensions.fontSize}`}>
               {text}
             </p>
           )}
 
           {subtext && (
-            <p className="text-xs text-gray-500 tracking-wider">
+            <p className="text-xs text-zinc-500 tracking-wider">
               {subtext}
             </p>
           )}

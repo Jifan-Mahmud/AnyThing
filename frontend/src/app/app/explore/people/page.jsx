@@ -150,7 +150,7 @@ export default function SuggestedPeoplePage() {
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 shrink-0 cursor-pointer ${
                       isFollowing
                         ? 'bg-white/5 border border-white/10 text-zinc-300 hover:bg-white/10'
-                        : 'bg-primary-pink text-white hover:bg-primary-pink-hover shadow-md shadow-primary-pink/25'
+                        : 'bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] text-white hover:opacity-90 shadow-md shadow-[#ff2e83]/25'
                     }`}
                   >
                     {isFollowing ? 'Following' : 'Follow'}

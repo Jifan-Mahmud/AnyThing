@@ -2,18 +2,13 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import BrandLogo from '../components/ui/BrandLogo';
 import {
   Video,
   MessageCircle,
-  Globe,
   Sparkles,
   ArrowRight,
-  ShieldCheck,
-  Zap,
-  Users,
   Compass,
-  Heart,
-  TrendingUp,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
@@ -25,23 +20,23 @@ const FEATURES = [
     icon: MessageCircle,
     title: 'Instant Realtime Chat',
     description: 'Ultra-low latency direct messaging, typing indicators, and instant read receipts powered by WebSockets.',
-    color: 'from-pink-500/20 to-purple-500/20',
-    border: 'border-pink-500/30',
+    color: 'from-[#ff2e83]/20 to-[#ffa07a]/20',
+    border: 'border-[#ff2e83]/30',
     iconColor: 'text-primary-pink',
   },
   {
     icon: Video,
     title: 'HD Video & Audio Calls',
     description: 'Peer-to-peer crystal clear WebRTC calls. Connect face-to-face with friends anywhere across the globe.',
-    color: 'from-purple-500/20 to-indigo-500/20',
-    border: 'border-purple-500/30',
-    iconColor: 'text-purple-400',
+    color: 'from-[#ffa07a]/20 to-[#ff2e83]/20',
+    border: 'border-[#ffa07a]/30',
+    iconColor: 'text-[#ffa07a]',
   },
   {
     icon: Sparkles,
     title: 'Immersive Reels & Stories',
     description: 'Express your day with high-res 24h disappearing stories and full-screen vertical reels with audio.',
-    color: 'from-pink-500/20 to-rose-500/20',
+    color: 'from-[#ff2e83]/20 to-rose-500/20',
     border: 'border-rose-500/30',
     iconColor: 'text-rose-400',
   },
@@ -49,9 +44,9 @@ const FEATURES = [
     icon: Compass,
     title: 'Dynamic Discovery',
     description: 'Discover creators tailored to your vibe. Explore trending media, hashtags, and fresh ideas instantly.',
-    color: 'from-cyan-500/20 to-blue-500/20',
-    border: 'border-cyan-500/30',
-    iconColor: 'text-cyan-400',
+    color: 'from-[#ffa07a]/20 to-amber-500/20',
+    border: 'border-amber-500/30',
+    iconColor: 'text-amber-400',
   },
 ];
 
@@ -74,17 +69,17 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-bg-darker text-white font-sans relative overflow-x-hidden selection:bg-primary-pink selection:text-white">
-      {/* Ambient Aurora Glows */}
+      {/* Ambient Sunset Glows (Hot Pink + Soft Peach) */}
       <div
-        className="aurora-bg w-[550px] h-[550px] bg-primary-pink/15 -top-40 -left-20"
+        className="aurora-bg w-[550px] h-[550px] bg-[#ff2e83]/15 -top-40 -left-20"
         style={{ animationDuration: '16s' }}
       />
       <div
-        className="aurora-bg w-[650px] h-[650px] bg-purple-600/10 -top-20 -right-40"
+        className="aurora-bg w-[650px] h-[650px] bg-[#ffa07a]/15 -top-20 -right-40"
         style={{ animationDuration: '22s', animationDelay: '-4s' }}
       />
       <div
-        className="aurora-bg w-[500px] h-[500px] bg-primary-pink/10 bottom-40 left-1/3"
+        className="aurora-bg w-[500px] h-[500px] bg-[#ff2e83]/10 bottom-40 left-1/3"
         style={{ animationDuration: '18s', animationDelay: '-8s' }}
       />
 
@@ -109,20 +104,7 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-bg-darker/70 border-b border-white/5 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center gap-2 cursor-pointer group"
-            onClick={() => router.push('/')}
-          >
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary-pink to-purple-600 flex items-center justify-center shadow-lg shadow-primary-pink/20 group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-black italic tracking-tight">
-              Any<span className="text-primary-pink text-glow">Thing</span>
-            </span>
-          </motion.div>
+          <BrandLogo size="md" onClick={() => router.push('/')} />
 
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -132,7 +114,7 @@ export default function LandingPage() {
           >
             <button
               onClick={() => router.push('/login')}
-              className="px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-all"
+              className="px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
             >
               Log In
             </button>
@@ -140,7 +122,7 @@ export default function LandingPage() {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => router.push('/signup')}
-              className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-bold bg-primary-pink hover:bg-primary-pink-hover text-white transition-all shadow-lg shadow-primary-pink/25 hover:shadow-primary-pink/40"
+              className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] hover:opacity-95 text-white transition-all shadow-lg shadow-[#ff2e83]/25 hover:shadow-[#ff2e83]/40 cursor-pointer"
             >
               Get Started
             </motion.button>
@@ -157,9 +139,9 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-zinc-300 mb-8 backdrop-blur-md"
         >
-          <span className="w-2 h-2 rounded-full bg-primary-pink animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#ffa07a] animate-pulse" />
           <span>The Next Evolution of Social Media</span>
-          <Sparkles className="w-3.5 h-3.5 text-primary-pink ml-1" />
+          <Sparkles className="w-3.5 h-3.5 text-[#ffa07a] ml-1" />
         </motion.div>
 
         {/* Primary Headline */}
@@ -170,7 +152,7 @@ export default function LandingPage() {
           className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] max-w-5xl"
         >
           Engage, Evolve & <br className="hidden sm:inline" />
-          <span className="text-gradient-pink">Excel on AnyThing</span>
+          <span className="text-gradient-brand">Excel on AnyThing</span>
         </motion.h1>
 
         {/* Description */}
@@ -195,7 +177,7 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push('/signup')}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold text-base shadow-xl shadow-primary-pink/30 flex items-center justify-center gap-2 group transition-all"
+            className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] hover:opacity-95 text-white font-bold text-base shadow-xl shadow-[#ff2e83]/30 flex items-center justify-center gap-2 group transition-all cursor-pointer"
           >
             <span>Start Free Journey</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -205,7 +187,7 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push('/login')}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white font-semibold text-base border border-white/10 backdrop-blur-md transition-all"
+            className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white font-semibold text-base border border-white/10 backdrop-blur-md transition-all cursor-pointer"
           >
             Sign In with Account
           </motion.button>
@@ -220,7 +202,7 @@ export default function LandingPage() {
         >
           <div className="glass-panel rounded-3xl sm:rounded-[36px] p-4 sm:p-8 md:p-10 border border-white/10 shadow-2xl relative overflow-hidden">
             {/* Background Gradient Mesh */}
-            <div className="absolute inset-0 bg-gradient-to-b from-primary-pink/10 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#ff2e83]/10 via-[#ffa07a]/5 to-transparent pointer-events-none" />
 
             {/* Showcase Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 items-center">
@@ -230,7 +212,7 @@ export default function LandingPage() {
                 className="glass-panel p-5 rounded-2xl border border-white/10 text-left flex flex-col gap-3 shadow-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-pink/20 flex items-center justify-center text-primary-pink">
+                  <div className="w-10 h-10 rounded-full bg-[#ff2e83]/20 flex items-center justify-center text-primary-pink">
                     <MessageCircle className="w-5 h-5" />
                   </div>
                   <div>
@@ -255,7 +237,7 @@ export default function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg-darker via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-left">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-pink text-white text-[11px] font-bold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] text-white text-[11px] font-bold mb-2">
                     <Sparkles className="w-3 h-3" />
                     <span>Featured Creator</span>
                   </div>
@@ -270,7 +252,7 @@ export default function LandingPage() {
                 className="glass-panel p-5 rounded-2xl border border-white/10 text-left flex flex-col gap-3 shadow-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+                  <div className="w-10 h-10 rounded-full bg-[#ffa07a]/20 flex items-center justify-center text-[#ffa07a]">
                     <Video className="w-5 h-5" />
                   </div>
                   <div>
@@ -304,7 +286,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="flex flex-col items-center text-center p-4 rounded-2xl hover:bg-white/5 transition-colors"
               >
-                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient-pink tracking-tight">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient-brand tracking-tight">
                   {stat.value}
                 </span>
                 <span className="mt-2 text-sm font-semibold text-white">{stat.label}</span>
@@ -318,7 +300,7 @@ export default function LandingPage() {
       {/* Features Grid Section */}
       <section className="relative z-10 py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-primary-pink mb-3">
+          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#ffa07a] mb-3">
             State of the Art Experience
           </h2>
           <h3 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
@@ -364,8 +346,8 @@ export default function LandingPage() {
       {/* Call To Action Banner */}
       <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="glass-panel rounded-3xl sm:rounded-[40px] p-8 sm:p-14 lg:p-20 border border-primary-pink/20 text-center relative overflow-hidden shadow-2xl">
-          <div className="absolute -top-32 -right-32 w-80 h-80 bg-primary-pink/20 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -top-32 -right-32 w-80 h-80 bg-[#ff2e83]/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[#ffa07a]/20 rounded-full blur-[100px] pointer-events-none" />
 
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-6">
@@ -378,7 +360,7 @@ export default function LandingPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/signup')}
-              className="px-9 py-4 rounded-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold text-lg shadow-2xl shadow-primary-pink/30 transition-all"
+              className="px-9 py-4 rounded-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] hover:opacity-95 text-white font-bold text-lg shadow-2xl shadow-[#ff2e83]/30 transition-all cursor-pointer"
             >
               Create Account Now
             </motion.button>
@@ -389,10 +371,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8 relative z-10 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-white tracking-tight">AnyThing Social</span>
-            <span>• Next-Gen Platform</span>
-          </div>
+          <BrandLogo size="sm" onClick={() => router.push('/')} />
           <div className="flex items-center gap-6">
             <span className="hover:text-zinc-300 cursor-pointer">Privacy</span>
             <span className="hover:text-zinc-300 cursor-pointer">Terms</span>

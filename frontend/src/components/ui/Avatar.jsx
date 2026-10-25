@@ -13,7 +13,7 @@ const Avatar = ({ src, alt, size = 'md', hasStory = false, isOnline = false, cla
   return (
     <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
       {hasStory ? (
-        <div className={`rounded-full bg-gradient-to-tr from-primary-pink via-purple-500 to-amber-400 p-[2.5px] shadow-sm shadow-primary-pink/20`}>
+        <div className="rounded-full bg-gradient-to-tr from-[#ff2e83] via-[#ff6584] to-[#ffa07a] p-[2.5px] shadow-sm shadow-[#ff2e83]/25">
           <div className={`rounded-full overflow-hidden ${currentSize} ring-2 ring-bg-darker`}>
             <img
               src={src || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'}

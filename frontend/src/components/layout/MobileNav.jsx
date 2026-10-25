@@ -40,7 +40,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
               {isActive && (
                 <motion.span
                   layoutId="activeMobileDot"
-                  className="w-1 h-1 bg-primary-pink rounded-full shadow-neon-pink"
+                  className="w-1.5 h-1.5 bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] rounded-full shadow-neon-pink"
                 />
               )}
             </motion.div>
@@ -48,12 +48,12 @@ const MobileNav = ({ onOpenCreatePost }) => {
         );
       })}
 
-      {/* Floating Center Create Button */}
+      {/* Floating Center Create Button with Hot Pink to Soft Peach Sunset Gradient */}
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={onOpenCreatePost}
-        className="p-3.5 bg-gradient-to-tr from-primary-pink to-purple-600 text-white rounded-full shadow-lg shadow-primary-pink/35 -mt-6 border-4 border-bg-darker transition-transform cursor-pointer"
+        className="p-3.5 bg-gradient-to-tr from-[#ff2e83] to-[#ffa07a] text-white rounded-full shadow-lg shadow-[#ff2e83]/35 -mt-6 border-4 border-bg-darker transition-transform cursor-pointer"
         aria-label="Create Post"
       >
         <Plus className="w-5 h-5" />
@@ -74,7 +74,7 @@ const MobileNav = ({ onOpenCreatePost }) => {
               {isActive && (
                 <motion.span
                   layoutId="activeMobileDot"
-                  className="w-1 h-1 bg-primary-pink rounded-full shadow-neon-pink"
+                  className="w-1.5 h-1.5 bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] rounded-full shadow-neon-pink"
                 />
               )}
             </motion.div>

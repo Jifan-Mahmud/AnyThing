@@ -57,7 +57,7 @@ const StoriesBar = ({ stories = [], currentUser, hasMyStory, myStory, onStoryUpl
                   e.stopPropagation();
                   fileInputRef.current?.click();
                 }}
-                className="absolute bottom-0 right-0 bg-primary-pink text-white rounded-full p-1 border-2 border-bg-darker shadow-md shadow-primary-pink/30 cursor-pointer"
+                className="absolute bottom-0 right-0 bg-gradient-to-tr from-[#ff2e83] to-[#ffa07a] text-white rounded-full p-1 border-2 border-bg-darker shadow-md shadow-[#ff2e83]/30 cursor-pointer"
                 aria-label="Add story"
               >
                 <Plus size={14} strokeWidth={3} />

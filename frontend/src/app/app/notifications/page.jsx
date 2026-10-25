@@ -42,7 +42,7 @@ const NotifIcon = ({ type }) => {
     case 'post':
       return <ImageIcon className={`${base} text-primary-pink`} />;
     case 'reel':
-      return <Film className={`${base} text-purple-400`} />;
+      return <Film className={`${base} text-[#ffa07a]`} />;
     case 'story':
       return <BookImage className={`${base} text-emerald-400`} />;
     case 'audio_call':

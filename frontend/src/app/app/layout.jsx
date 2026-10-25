@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/layout/Sidebar';
 import MobileNav from '../../components/layout/MobileNav';
 import CreatePostModal from '../../components/feed/CreatePostModal';
+import BrandLogo from '../../components/ui/BrandLogo';
 import { Heart, Envelope } from '@gravity-ui/icons';
-import { Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
@@ -39,16 +39,9 @@ export default function AppProtectedLayout({ children }) {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg-darker text-white flex-col md:flex-row font-sans">
-      {/* Mobile Top Header */}
+      {/* Mobile Top Header with Typographic BrandLogo */}
       <header className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/5 bg-bg-darker/90 backdrop-blur-xl z-40 shrink-0">
-        <Link href="/app" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-primary-pink to-purple-600 flex items-center justify-center shadow-md shadow-primary-pink/20">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-xl font-black tracking-tight italic text-white">
-            Any<span className="text-primary-pink text-glow">Thing</span>
-          </span>
-        </Link>
+        <BrandLogo size="sm" onClick={() => router.push('/app')} />
         <div className="flex items-center gap-4">
           <Link
             href="/app/notifications"

@@ -158,7 +158,7 @@ export default function ProfilePage() {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setIsEditOpen(true)}
-                  className="px-4 py-2 bg-primary-pink hover:bg-primary-pink-hover text-white rounded-xl font-bold text-xs shadow-md shadow-primary-pink/20 transition-all cursor-pointer"
+                  className="px-4 py-2 bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] hover:opacity-90 text-white rounded-xl font-bold text-xs shadow-md shadow-[#ff2e83]/20 transition-all cursor-pointer"
                 >
                   Edit Profile
                 </motion.button>
@@ -219,10 +219,10 @@ export default function ProfilePage() {
                 <Icon size={16} />
                 <span>{tab.label}</span>
                 {isActive && (
-                  <motion.div
-                    layoutId="activeProfileTab"
-                    className="absolute bottom-0 inset-x-0 h-0.5 bg-primary-pink shadow-neon-pink"
-                  />
+                    <motion.div
+                      layoutId="activeProfileTab"
+                      className="absolute bottom-0 inset-x-0 h-0.5 bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] shadow-neon-pink"
+                    />
                 )}
               </button>
             );

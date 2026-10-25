@@ -9,6 +9,19 @@ import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'motion/react';
 
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
 const PostCard = ({ post }) => {
   const router = useRouter();
   const { user: currentUser } = useAuth();
@@ -59,7 +72,7 @@ const PostCard = ({ post }) => {
   const handleDoubleTap = () => {
     setLiked(true);
     setShowHeartBurst(true);
-    setTimeout(() => setShowHeartBurst(false), 900);
+    setTimeout(() => setShowHeartBurst(false), 850);
   };
 
   const handleAddComment = () => {
@@ -88,15 +101,36 @@ const PostCard = ({ post }) => {
     post.image?.endsWith('.mov') ||
     post.image?.endsWith('.webm');
 
+  const displayLikes = liked ? post.likes + 1 : post.likes;
+
+  // Render caption with peach highlighted hashtags
+  const renderFormattedCaption = (text) => {
+    if (!text) return null;
+    const parts = text.split(/(#[a-zA-Z0-9_]+)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('#')) {
+        return (
+          <span
+            key={index}
+            className="text-[#ffa07a] font-semibold hover:underline cursor-pointer"
+          >
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
-      className="glass-panel rounded-3xl overflow-hidden mb-6 border border-white/5 shadow-xl hover:border-white/10 transition-all sm:max-w-xl md:max-w-2xl mx-auto w-full select-none"
+      className="glass-panel rounded-[26px] sm:rounded-[30px] overflow-hidden mb-6 border border-white/[0.08] hover:border-white/15 transition-all shadow-2xl shadow-black/40 sm:max-w-xl md:max-w-2xl mx-auto w-full select-none"
     >
       {/* Post Header */}
-      <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-white/[0.04]">
+      <div className="flex items-center justify-between px-4 py-3.5 sm:px-5 sm:py-4 border-b border-white/[0.04]">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={goToProfile}>
           <motion.div whileHover={{ scale: 1.05 }} className="transition-transform">
             <Avatar src={post.user?.avatar} size="md" hasStory={post.user?.hasStory} />
@@ -106,40 +140,47 @@ const PostCard = ({ post }) => {
               <h4 className="text-sm font-bold text-white group-hover:text-primary-pink transition-colors">
                 {post.user?.username}
               </h4>
-              {post.user?.isVerified && (
-                <Sparkles className="w-3.5 h-3.5 text-primary-pink" />
+              <Sparkles className="w-3.5 h-3.5 text-soft-peach" />
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-medium">
+              <span>{formatTimeAgo(post.timeAgo || post.createdAt)}</span>
+              {post.location && (
+                <>
+                  <span>•</span>
+                  <span className="text-zinc-500">{post.location}</span>
+                </>
               )}
             </div>
-            <p className="text-[11px] text-zinc-400 font-medium">
-              {post.location || post.timeAgo}
-            </p>
           </div>
         </div>
 
-        {currentUser && post.user?.id === currentUser._id ? (
-          <button className="text-zinc-400 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/5">
-            <MoreHorizontal size={18} />
-          </button>
-        ) : (
-          post.user?.username !== 'jason_creativ' && (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={handleFollowToggle}
-              className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
-                isFollowing
-                  ? 'text-zinc-400 bg-white/5 hover:text-white hover:bg-white/10'
-                  : 'text-primary-pink bg-primary-pink/10 hover:bg-primary-pink hover:text-white'
-              }`}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </motion.button>
-          )
-        )}
+        <div className="flex items-center gap-2">
+          {currentUser && post.user?.id === currentUser._id ? (
+            <button className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5 cursor-pointer">
+              <MoreHorizontal size={19} />
+            </button>
+          ) : (
+            post.user?.username !== 'jason_creativ' && (
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={handleFollowToggle}
+                className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                  isFollowing
+                    ? 'bg-white/10 hover:bg-white/15 text-zinc-200 border border-white/15 backdrop-blur-md'
+                    : 'bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] text-white shadow-md shadow-[#ff2e83]/30 hover:opacity-95'
+                }`}
+              >
+                {isFollowing ? 'Following' : 'Follow'}
+              </motion.button>
+            )
+          )}
+        </div>
       </div>
 
       {/* Post Media Container */}
       <div
-        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] bg-bg-darker cursor-pointer overflow-hidden group"
+        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] bg-bg-darker cursor-pointer overflow-hidden group select-none"
         onDoubleClick={handleDoubleTap}
       >
         {isVideo ? (
@@ -169,7 +210,7 @@ const PostCard = ({ post }) => {
               transition={{ duration: 0.6 }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
             >
-              <HeartFill className="w-24 h-24 text-primary-pink drop-shadow-[0_0_25px_rgba(255,75,152,0.85)]" />
+              <HeartFill className="w-24 h-24 text-primary-pink drop-shadow-[0_0_30px_rgba(255,46,131,0.9)]" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -177,8 +218,9 @@ const PostCard = ({ post }) => {
 
       {/* Post Actions & Metadata */}
       <div className="p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4">
+        {/* Action Buttons Row */}
+        <div className="flex items-center justify-between mb-3.5">
+          <div className="flex items-center gap-5">
             <motion.button
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
@@ -187,7 +229,7 @@ const PostCard = ({ post }) => {
               aria-label="Like post"
             >
               {liked ? (
-                <HeartFill className="w-6 h-6 text-primary-pink drop-shadow-[0_0_10px_rgba(255,75,152,0.6)]" />
+                <HeartFill className="w-6 h-6 text-primary-pink drop-shadow-[0_0_12px_rgba(255,46,131,0.7)]" />
               ) : (
                 <Heart className="w-6 h-6 text-zinc-300 hover:text-white" />
               )}
@@ -200,7 +242,7 @@ const PostCard = ({ post }) => {
               className="text-zinc-300 hover:text-white transition-colors cursor-pointer"
               aria-label="Comments"
             >
-              <MessageCircle size={22} />
+              <MessageCircle size={23} />
             </motion.button>
 
             <motion.button
@@ -209,7 +251,7 @@ const PostCard = ({ post }) => {
               className="text-zinc-300 hover:text-white transition-colors cursor-pointer"
               aria-label="Share"
             >
-              <Send size={22} className="-mt-0.5" />
+              <Send size={23} className="-mt-0.5" />
             </motion.button>
           </div>
 
@@ -220,13 +262,41 @@ const PostCard = ({ post }) => {
             className="cursor-pointer transition-colors text-zinc-300 hover:text-white"
             aria-label="Save"
           >
-            <Bookmark size={22} fill={saved ? 'currentColor' : 'none'} />
+            <Bookmark size={23} fill={saved ? 'currentColor' : 'none'} />
           </motion.button>
         </div>
 
-        {/* Likes Count */}
-        <div className="font-bold text-xs sm:text-sm mb-2 text-white tracking-tight">
-          {liked ? (post.likes + 1).toLocaleString() : post.likes.toLocaleString()} likes
+        {/* Social Proof / Likes Counter with Avatar Stack */}
+        <div className="flex items-center gap-2 mb-2.5">
+          {displayLikes > 0 ? (
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-2 overflow-hidden">
+                <img
+                  className="inline-block h-5 w-5 rounded-full ring-2 ring-bg-darker"
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=U1"
+                  alt=""
+                />
+                <img
+                  className="inline-block h-5 w-5 rounded-full ring-2 ring-bg-darker"
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=U2"
+                  alt=""
+                />
+                <img
+                  className="inline-block h-5 w-5 rounded-full ring-2 ring-bg-darker"
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=U3"
+                  alt=""
+                />
+              </div>
+              <p className="text-xs text-zinc-300 font-medium">
+                Liked by <span className="font-bold text-white">creators</span> and{' '}
+                <span className="font-bold text-white">{displayLikes.toLocaleString()} others</span>
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-400 font-medium">
+              Be the first to <span onClick={() => setLiked(true)} className="text-primary-pink font-bold hover:underline cursor-pointer">like this</span>
+            </p>
+          )}
         </div>
 
         {/* Caption */}
@@ -237,7 +307,9 @@ const PostCard = ({ post }) => {
           >
             {post.user?.username}
           </span>
-          <span className="text-zinc-300">{post.caption}</span>
+          <span className="text-zinc-200">
+            {renderFormattedCaption(post.caption)}
+          </span>
         </div>
 
         {/* Recent Comments */}
@@ -251,7 +323,7 @@ const PostCard = ({ post }) => {
         {/* Comments Link */}
         <button
           onClick={() => setShowCommentBox(true)}
-          className="text-zinc-400 text-xs mt-2 hover:text-zinc-200 transition-colors font-medium block"
+          className="text-zinc-400 text-xs mt-2 hover:text-zinc-200 transition-colors font-medium block cursor-pointer"
         >
           View all {post.comments + recentComments.length} comments
         </button>
@@ -268,7 +340,7 @@ const PostCard = ({ post }) => {
               src={currentUser?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me'}
               size="sm"
             />
-            <div className="flex-1 relative flex items-center bg-white/5 rounded-full px-4 py-2 border border-white/10 focus-within:border-primary-pink/40">
+            <div className="flex-1 relative flex items-center bg-white/5 rounded-full px-4 py-2 border border-white/10 focus-within:border-primary-pink/50">
               <input
                 type="text"
                 value={commentText}

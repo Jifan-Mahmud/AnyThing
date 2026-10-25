@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import BrandLogo from '../../components/ui/BrandLogo';
 import {
   Mail,
   Lock,
@@ -13,7 +14,6 @@ import {
   Loader2,
   Eye,
   EyeOff,
-  Zap,
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -55,13 +55,13 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-bg-darker font-sans text-white relative overflow-hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      {/* Ambient Aurora Glows */}
+      {/* Ambient Sunset Glows (Hot Pink + Soft Peach) */}
       <div
-        className="aurora-bg w-[550px] h-[550px] bg-primary-pink/15 -top-20 -right-20"
+        className="aurora-bg w-[550px] h-[550px] bg-[#ff2e83]/15 -top-20 -right-20"
         style={{ animationDuration: '16s' }}
       />
       <div
-        className="aurora-bg w-[450px] h-[450px] bg-purple-600/15 -bottom-20 -left-20"
+        className="aurora-bg w-[450px] h-[450px] bg-[#ffa07a]/15 -bottom-20 -left-20"
         style={{ animationDuration: '20s', animationDelay: '-5s' }}
       />
 
@@ -74,14 +74,14 @@ export default function SignupPage() {
         >
           <button
             onClick={() => router.push('/')}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition-colors group"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition-colors group cursor-pointer"
           >
             <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span>Back to Home</span>
           </button>
 
           <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-400">
-            <Sparkles className="w-3 h-3 text-primary-pink" />
+            <Sparkles className="w-3 h-3 text-soft-peach" />
             <span>Join 150K+ Creators</span>
           </div>
         </motion.div>
@@ -93,15 +93,10 @@ export default function SignupPage() {
           transition={{ duration: 0.4 }}
           className="glass-panel border border-white/10 rounded-3xl sm:rounded-[36px] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
         >
-          {/* Header & Logo */}
-          <div className="text-center mb-6">
-            <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-pink to-purple-600 items-center justify-center shadow-lg shadow-primary-pink/25 mb-4">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black italic tracking-tight">
-              Any<span className="text-primary-pink text-glow">Thing</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-2 font-medium">
+          {/* Header & Typographic Logo */}
+          <div className="text-center mb-6 flex flex-col items-center">
+            <BrandLogo size="lg" className="mb-2" onClick={() => router.push('/')} />
+            <p className="text-xs sm:text-sm text-zinc-400 font-medium">
               Join the new era of creator community & realtime social.
             </p>
           </div>
@@ -121,7 +116,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-4">
             {/* Avatar Upload */}
             <div className="flex flex-col items-center gap-2 mb-2">
-              <div className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-primary-pink/50 hover:border-primary-pink shadow-lg transition-colors">
+              <div className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-[#ff2e83]/50 hover:border-[#ffa07a] shadow-lg transition-colors">
                 <img
                   src={avatarPreview || 'https://api.dicebear.com/7.x/avataaars/svg?seed=newuser'}
                   alt="Avatar Preview"
@@ -144,7 +139,7 @@ export default function SignupPage() {
                 />
               </div>
               <span
-                className="text-[11px] font-bold text-primary-pink cursor-pointer hover:underline"
+                className="text-[11px] font-bold text-soft-peach cursor-pointer hover:underline"
                 onClick={() => document.getElementById('signup-avatar-input')?.click()}
               >
                 Choose Profile Photo
@@ -211,7 +206,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -238,7 +233,7 @@ export default function SignupPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-pink hover:bg-primary-pink-hover text-white font-bold py-3.5 rounded-2xl transition-all shadow-xl shadow-primary-pink/25 mt-4 flex items-center justify-center gap-2 group disabled:opacity-60 cursor-pointer"
+              className="w-full bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] hover:opacity-95 text-white font-bold py-3.5 rounded-2xl transition-all shadow-xl shadow-[#ff2e83]/25 mt-4 flex items-center justify-center gap-2 group disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -260,7 +255,7 @@ export default function SignupPage() {
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="text-primary-pink font-bold hover:underline underline-offset-4 ml-1"
+                className="text-soft-peach font-bold hover:underline underline-offset-4 ml-1"
               >
                 Sign In
               </Link>

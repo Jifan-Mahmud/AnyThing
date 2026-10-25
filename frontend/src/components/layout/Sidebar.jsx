@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Avatar from '../ui/Avatar';
+import BrandLogo from '../ui/BrandLogo';
 import {
   House,
   Video,
@@ -14,7 +15,6 @@ import {
   Plus,
   ArrowRightFromSquare,
 } from '@gravity-ui/icons';
-import { Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -41,20 +41,10 @@ const Sidebar = ({ onOpenCreatePost }) => {
 
   return (
     <div className="flex flex-col h-full py-6 px-4 sm:px-5 border-r border-white/5 bg-bg-darker/95 backdrop-blur-2xl select-none">
-      {/* Brand Logo Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 px-3 cursor-pointer flex items-center gap-2.5 group"
-        onClick={() => router.push('/app')}
-      >
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-pink to-purple-600 flex items-center justify-center shadow-lg shadow-primary-pink/25 group-hover:scale-105 transition-transform">
-          <Zap className="w-5 h-5 text-white" />
-        </div>
-        <div className="text-2xl font-black tracking-tight italic text-white">
-          Any<span className="text-primary-pink text-glow">Thing</span>
-        </div>
-      </motion.div>
+      {/* Brand Typographic Logo Header */}
+      <div className="mb-8 px-3">
+        <BrandLogo size="md" onClick={() => router.push('/app')} />
+      </div>
 
       {/* Navigation Items */}
       <nav className="flex-1 space-y-1.5">
@@ -76,7 +66,7 @@ const Sidebar = ({ onOpenCreatePost }) => {
                 {isActive && (
                   <motion.div
                     layoutId="activeSidebarIndicator"
-                    className="absolute left-0 w-1.5 h-6 bg-primary-pink rounded-r-full shadow-neon-pink"
+                    className="absolute left-0 w-1.5 h-6 bg-gradient-to-b from-[#ff2e83] to-[#ffa07a] rounded-r-full shadow-neon-pink"
                     transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}
@@ -87,13 +77,13 @@ const Sidebar = ({ onOpenCreatePost }) => {
           );
         })}
 
-        {/* Create Post Action Button */}
+        {/* Create Post Action Button with Hot Pink to Soft Peach Sunset Gradient */}
         <div className="pt-3">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onOpenCreatePost}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-primary-pink to-purple-600 text-white font-bold text-sm shadow-lg shadow-primary-pink/25 hover:shadow-primary-pink/40 transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#ff2e83] to-[#ffa07a] text-white font-bold text-sm shadow-lg shadow-[#ff2e83]/25 hover:shadow-[#ff2e83]/40 transition-all cursor-pointer"
           >
             <Plus className="w-5 h-5" />
             <span className="tracking-tight">Create Post</span>
