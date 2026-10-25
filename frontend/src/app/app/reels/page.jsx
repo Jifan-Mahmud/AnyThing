@@ -10,11 +10,11 @@ import {
   Volume2,
   VolumeX,
   X,
-  Smile,
   Loader2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Avatar from '../../../components/ui/Avatar';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { motion, AnimatePresence } from 'motion/react';
 
 const MOCK_REELS = [
@@ -392,8 +392,12 @@ export default function ReelsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-black">
-        <Loader2 className="animate-spin text-primary-pink" size={40} />
+      <div className="flex h-full w-full items-center justify-center bg-black p-12">
+        <LoadingSpinner
+          size="lg"
+          text="Loading reels..."
+          subtext="Immersive video feed"
+        />
       </div>
     );
   }

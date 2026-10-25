@@ -8,7 +8,7 @@ import MobileNav from '../../components/layout/MobileNav';
 import CreatePostModal from '../../components/feed/CreatePostModal';
 import { Heart, Envelope } from '@gravity-ui/icons';
 import { useAuth } from '../../context/AuthContext';
-import { Loader2 } from 'lucide-react';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function AppProtectedLayout({ children }) {
   const { user, loading } = useAuth();
@@ -23,9 +23,12 @@ export default function AppProtectedLayout({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-darker flex items-center justify-center text-white">
-        <Loader2 className="animate-spin text-primary-pink" size={40} />
-      </div>
+      <LoadingSpinner
+        fullScreen={true}
+        size="lg"
+        text="Loading AnyThing..."
+        subtext="Syncing your feed, stories and messages..."
+      />
     );
   }
 

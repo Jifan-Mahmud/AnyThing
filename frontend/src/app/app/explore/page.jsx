@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Film, X, Loader2, ArrowLeft } from 'lucide-react';
+import { Search, Film, X, ArrowLeft } from 'lucide-react';
 import PostCard from '../../../components/feed/PostCard';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { motion, AnimatePresence } from 'motion/react';
 
 const MOCK_EXPLORE_POSTS = [
@@ -170,8 +171,12 @@ export default function ExplorePage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-1 items-center justify-center py-20">
-          <Loader2 className="animate-spin text-primary-pink" size={40} />
+        <div className="flex flex-1 items-center justify-center py-24">
+          <LoadingSpinner
+            size="lg"
+            text="Discovering content..."
+            subtext="Curating posts and trending media"
+          />
         </div>
       ) : posts.length > 0 ? (
         /* Explore Grid */

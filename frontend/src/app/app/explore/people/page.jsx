@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, UserPlus } from 'lucide-react';
+import { ArrowLeft, UserPlus } from 'lucide-react';
+import LoadingSpinner from '../../../../components/ui/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../../../context/AuthContext';
 import { motion } from 'motion/react';
@@ -103,7 +104,11 @@ export default function SuggestedPeoplePage() {
         {/* List */}
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="animate-spin text-primary-pink" size={36} />
+            <LoadingSpinner
+              size="lg"
+              text="Finding creators..."
+              subtext="Loading suggestions for you"
+            />
           </div>
         ) : suggestions.length > 0 ? (
           <div className="space-y-1 bg-surface border border-white/5 rounded-3xl p-4 md:p-6 shadow-xl">

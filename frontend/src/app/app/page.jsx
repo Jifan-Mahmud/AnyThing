@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import StoriesBar from '../../components/feed/StoriesBar';
 import PostCard from '../../components/feed/PostCard';
-import { Loader2 } from 'lucide-react';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useSocket } from '../../context/SocketContext';
@@ -197,8 +197,12 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
-        <Loader2 className="animate-spin text-primary-pink" size={40} />
+      <div className="flex h-full w-full items-center justify-center p-12">
+        <LoadingSpinner
+          size="lg"
+          text="Loading your feed..."
+          subtext="Fetching the freshest posts & reels"
+        />
       </div>
     );
   }

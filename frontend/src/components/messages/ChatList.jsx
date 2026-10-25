@@ -1,23 +1,44 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Search } from 'lucide-react';
 import Avatar from '../ui/Avatar';
+import LoadingSpinner from '../ui/LoadingSpinner';
 import { motion } from 'motion/react';
 
 const ChatList = ({ users, loading, error, onSelectUser }) => {
   if (loading) {
     return (
-      <div className="flex flex-col h-full border-r border-white/5 w-full md:w-80 lg:w-96 bg-bg-darker p-4 text-gray-400">
-        Loading chats...
+      <div className="flex flex-col h-full border-r border-white/5 w-full md:w-80 lg:w-96 bg-bg-darker z-10 relative">
+        <div className="p-4 border-b border-white/5 backdrop-blur-md sticky top-0 z-20">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+              Messages
+            </h2>
+            <span className="w-8 h-5 rounded-full bg-white/5 animate-pulse" />
+          </div>
+          <div className="relative">
+            <div className="w-full bg-surface/50 h-10 rounded-xl border border-white/5 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Improved Loading Spinner State */}
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <LoadingSpinner
+            size="md"
+            text="Loading chats..."
+            subtext="Connecting to your contacts"
+          />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col h-full border-r border-white/5 w-full md:w-80 lg:w-96 bg-bg-darker p-4 text-red-400">
-        Error: {error}
+      <div className="flex flex-col h-full border-r border-white/5 w-full md:w-80 lg:w-96 bg-bg-darker p-6 text-red-400 items-center justify-center text-center">
+        <p className="text-sm font-semibold mb-1">Failed to load chats</p>
+        <p className="text-xs text-gray-500">{error}</p>
       </div>
     );
   }
@@ -47,7 +68,7 @@ const ChatList = ({ users, loading, error, onSelectUser }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
-        {users &&
+        {users && users.length > 0 ? (
           users.filter(Boolean).map((u) => {
             return (
               <motion.div
@@ -61,18 +82,25 @@ const ChatList = ({ users, loading, error, onSelectUser }) => {
                   <Avatar src={u.avatarUrl} size="md" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-0.5">
-                    <h4 className="text-sm truncate font-semibold text-gray-300 group-hover:text-white transition-colors">
-                      {u.username}
-                    </h4>
-                  </div>
+                  <h4 className="font-semibold text-sm text-gray-200 group-hover:text-white transition-colors truncate">
+                    {u.name || u.username}
+                  </h4>
+                  <p className="text-xs text-gray-500 truncate group-hover:text-gray-400 transition-colors">
+                    @{u.username}
+                  </p>
                 </div>
               </motion.div>
             );
-          })}
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 text-center text-gray-500">
+            <p className="text-sm font-medium">No contacts yet</p>
+            <p className="text-xs text-gray-600 mt-1">Follow creators to start chatting</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default ChatList;
+export default memo(ChatList);

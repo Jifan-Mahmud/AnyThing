@@ -11,9 +11,9 @@ import {
   Phone,
   Video,
   Loader2,
-  Bell,
   Trash2,
 } from 'lucide-react';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
 import { toast } from 'react-toastify';
@@ -315,8 +315,12 @@ export default function NotificationsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="animate-spin text-primary-pink" size={36} />
+        <div className="flex justify-center py-24">
+          <LoadingSpinner
+            size="lg"
+            text="Loading notifications..."
+            subtext="Checking for new activity"
+          />
         </div>
       ) : notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
